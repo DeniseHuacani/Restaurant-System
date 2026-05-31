@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestoFlow POS - Catalog Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c6c6cd",
+                        "tertiary-fixed": "#fcdeb5",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#54647a",
+                        "on-primary-container": "#7c839b",
+                        "primary-fixed": "#dae2fd",
+                        "surface": "#fcf8fa",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "background": "#fcf8fa",
+                        "inverse-primary": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "on-secondary-fixed": "#0b1c30",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#d0e1fb",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container": "#f0edef",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "outline": "#76777d",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-low": "#f6f3f5",
+                        "secondary": "#505f76",
+                        "on-tertiary-container": "#98805d",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface": "#1b1b1d",
+                        "surface-tint": "#565e74",
+                        "tertiary": "#000000",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container-high": "#eae7e9",
+                        "on-secondary": "#ffffff",
+                        "primary": "#000000",
+                        "surface-dim": "#dcd9db",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e4e2e4",
+                        "inverse-on-surface": "#f3f0f2",
+                        "surface-bright": "#fcf8fa",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-variant": "#e4e2e4",
+                        "primary-container": "#131b2e",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "inverse-surface": "#303032",
+                        "tertiary-container": "#271901"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "sm": "12px",
+                        "sidebar-width": "320px",
+                        "lg": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "display": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface-container border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">RestoFlow POS</span>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-xs rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">notifications</span>
+</button>
+<button class="p-xs rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">account_circle</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-md z-40 bg-surface-container dark:bg-surface-container-low border-r border-outline-variant dark:border-outline w-sidebar-width pt-20">
+<div class="flex flex-col mb-xl px-xs">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface">Admin Portal</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Floor Manager</span>
+</div>
+<nav class="flex-1 space-y-base">
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-on-secondary-fixed-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm p-sm bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Catalog</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-on-secondary-fixed-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-label-md text-label-md">Tables</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-on-secondary-fixed-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Waiters</span>
+</a>
+</nav>
+<button class="mt-md mb-xl w-full bg-primary text-on-primary py-sm font-label-md text-label-md rounded-lg active:opacity-80 transition-all uppercase tracking-widest">
+            New Shift
+        </button>
+<div class="border-t border-outline-variant pt-md space-y-base">
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-on-secondary-fixed-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-on-secondary-fixed-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-xl text-error" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width pt-16 flex h-screen">
+<!-- Table-based Catalog Management View -->
+<div class="flex-1 p-lg overflow-y-auto bg-surface-bright">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h1 class="font-display text-display text-on-background">Catalog Management</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Organize and manage your restaurant menu items.</p>
+</div>
+<button class="flex items-center gap-xs px-lg py-sm bg-primary text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+                    Add Product
+                </button>
+</div>
+<!-- Management Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-md font-label-md text-label-md text-on-surface-variant">ID</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant">NAME</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant text-right">PRICE</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant text-center">AVAILABILITY</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant">DESCRIPTION</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant">STATUS</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">#P-1024</td>
+<td class="p-md font-headline-sm text-headline-sm text-on-surface">Ribeye Steak</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface text-right">$34.50</td>
+<td class="p-md text-center">
+<label class="inline-flex relative items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="p-md text-on-surface-variant truncate max-w-[200px]">Prime aged beef, grilled to perfection with rosemary butter.</td>
+<td class="p-md">
+<span class="px-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">Active</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-xs">
+<button class="p-xs rounded-lg hover:bg-surface-variant text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<div class="relative group/tooltip">
+<button class="p-xs rounded-lg hover:bg-error-container text-error transition-all active:scale-90">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<span class="absolute bottom-full right-0 mb-2 hidden group-hover/tooltip:block bg-inverse-surface text-inverse-on-surface text-[10px] py-1 px-2 rounded-sm whitespace-nowrap shadow-lg">Cannot delete: Active Orders</span>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">#P-1025</td>
+<td class="p-md font-headline-sm text-headline-sm text-on-surface">Truffle Pasta</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface text-right">$22.00</td>
+<td class="p-md text-center">
+<label class="inline-flex relative items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="p-md text-on-surface-variant truncate max-w-[200px]">Fresh tagliatelle with black truffle cream and parmesan.</td>
+<td class="p-md">
+<span class="px-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">Active</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-xs">
+<button class="p-xs rounded-lg hover:bg-surface-variant text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<div class="relative group/tooltip">
+<button class="p-xs rounded-lg hover:bg-error-container text-error transition-all active:scale-90">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<span class="absolute bottom-full right-0 mb-2 hidden group-hover/tooltip:block bg-inverse-surface text-inverse-on-surface text-[10px] py-1 px-2 rounded-sm whitespace-nowrap shadow-lg">Safely archive item</span>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container transition-colors group opacity-60">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">#P-1026</td>
+<td class="p-md font-headline-sm text-headline-sm text-on-surface">Caesar Salad</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface text-right">$14.95</td>
+<td class="p-md text-center">
+<label class="inline-flex relative items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="p-md text-on-surface-variant truncate max-w-[200px]">Romaine lettuce, garlic croutons, house dressing.</td>
+<td class="p-md">
+<span class="px-sm py-1 rounded-full bg-outline-variant text-on-surface-variant font-label-md text-label-md">Inactive</span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-xs">
+<button class="p-xs rounded-lg hover:bg-surface-variant text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<div class="relative group/tooltip">
+<button class="p-xs rounded-lg hover:bg-error-container text-error transition-all active:scale-90">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<span class="absolute bottom-full right-0 mb-2 hidden group-hover/tooltip:block bg-inverse-surface text-inverse-on-surface text-[10px] py-1 px-2 rounded-sm whitespace-nowrap shadow-lg">Confirm deletion</span>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Sidebar (Reference Catalog) -->
+<div class="w-sidebar-width border-l border-outline-variant bg-surface flex flex-col">
+<div class="p-md border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Catalog View</h3>
+<div class="flex gap-xs overflow-x-auto no-scrollbar">
+<button class="px-sm py-1 bg-primary text-on-primary rounded-full font-label-md text-label-md whitespace-nowrap">All Items</button>
+<button class="px-sm py-1 hover:bg-surface-container rounded-full font-label-md text-label-md whitespace-nowrap">Starters</button>
+<button class="px-sm py-1 hover:bg-surface-container rounded-full font-label-md text-label-md whitespace-nowrap">Mains</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto sidebar-scroll p-md space-y-md">
+<!-- Sidebar Item 1 -->
+<div class="p-sm bg-surface-container-low border border-outline-variant rounded-lg flex gap-md items-center group hover:border-primary transition-colors cursor-pointer">
+<div class="w-16 h-16 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A professional culinary photograph of a perfectly seared ribeye steak resting on a rustic wooden board. The lighting is warm and dramatic, highlighting the texture of the meat and a sprig of fresh rosemary. The background is a moody, dark restaurant setting with soft bokeh of amber lights. The image conveys high-end quality and artisanal preparation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWFkUhad-E6Vg4F9iijt-JYGjXbZKkIT_fqT5bqCSOG9En2RG7Iq-NikZlbakbsTTKrolYgU_ITlWiQAKchqKIFn104bazfTL8DYeI6DstNhWE3JCip5w_6yCqZo-A87onn9Ge-7PRu7XkEJbarMB6Li3V_3AuQipGXy5iYzRnW8k9pJCNOqmxjd45I4WbTNTn_ebg21VXKbWGsC1KDNP_9BsCxkKUD9NDXB4U1aefh86Tln63EMUG5tEyHGSNDo7x5sxFpkZs4alN"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface font-semibold truncate">Ribeye Steak</p>
+<p class="font-data-mono text-data-mono text-primary">$34.50</p>
+<p class="font-label-md text-[10px] text-on-surface-variant mt-1">STOCK: 14 UNITS</p>
+</div>
+</div>
+<!-- Sidebar Item 2 -->
+<div class="p-sm bg-surface-container-low border border-outline-variant rounded-lg flex gap-md items-center group hover:border-primary transition-colors cursor-pointer">
+<div class="w-16 h-16 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A close-up shot of a sophisticated truffle pasta dish served in a wide-rimmed white ceramic bowl. The scene is lit by bright, natural daylight from a large window, creating a clean and airy modern aesthetic. The palette is dominated by creamy whites and rich browns of sliced truffles. The atmosphere is upscale and refined, emphasizing the gourmet nature of the meal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVOK9qYivtT3T0guLKKZhNruGyxcmIPvZeQP4vcL4Ij2fSu9vY6Fls7VPyQYIZvNpWdNvqQCstPwPzhqclF3xXCXNcbcTJKtgdqCHRBOGjBwx77vEmmLLQByXllb2Dr-fIcDBfZkYlcQbEKQp_Ng77i2I55QbFC2ZlujgYT0O0Wf7fkW-G2BftkWu5OZoxmNVpFRZig4F4Qf7-xyozUBeUwwxP8Msb9jw6bxk2dnZRlKtQ2Ikqr2ACaYS97TNHonMItdhaomwYyVLt"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface font-semibold truncate">Truffle Pasta</p>
+<p class="font-data-mono text-data-mono text-primary">$22.00</p>
+<p class="font-label-md text-[10px] text-on-surface-variant mt-1">STOCK: 42 UNITS</p>
+</div>
+</div>
+<!-- Sidebar Item 3 -->
+<div class="p-sm bg-surface-container-low border border-outline-variant rounded-lg flex gap-md items-center group hover:border-primary transition-colors cursor-pointer">
+<div class="w-16 h-16 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A vibrant and crisp Caesar salad with golden croutons and shaved parmesan cheese. The photography style is sharp and high-contrast, with cool studio lighting that makes the green lettuce pop against a neutral gray stone background. The overall mood is fresh, healthy, and systematic, fitting a corporate modern dining environment with a focus on ingredients." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmKgYIqqNqNm63S9MQBSQCbc3jDgPWRXh2CBnejtRyBO_mFV5kPPuU-nHyTL_w7C1QTU-WWfrVxs0sycUrZt7952tytHUFhAzFBKbEalqhZR0p_5GRhAAIW-z8kn6FmuRHDyTTCJGDD34Hea0dVSOCpVvG1jAvFKVDZ8XPhXLlqs4CIoCI4BmR_dv6oTSeYZo7LpRp2i6Duvtjdf36Bub6N3Lhy4_0BGAHgIR4QtqIMBZMmeVeaPHJY0IOhqXaBBdZsRpFtbWqqEyH"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface font-semibold truncate">Caesar Salad</p>
+<p class="font-data-mono text-data-mono text-primary">$14.95</p>
+<p class="font-label-md text-[10px] text-error mt-1">STOCK: OUT OF ORDER</p>
+</div>
+</div>
+</div>
+<div class="p-md bg-surface-container-high border-t border-outline-variant">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Items</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">128 Products</span>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple logic for toggle simulation
+        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const row = e.target.closest('tr');
+                if (e.target.checked) {
+                    row.classList.remove('opacity-60');
+                } else {
+                    row.classList.add('opacity-60');
+                }
+            });
+        });
+
+        // Search highlight interaction logic
+        const sidebarItems = document.querySelectorAll('.sidebar-scroll > div');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('ring-2', 'ring-primary'));
+                item.classList.add('ring-2', 'ring-primary');
+            });
+        });
+    </script>
+</body></html>

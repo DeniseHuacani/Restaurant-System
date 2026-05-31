@@ -1,7 +1,20 @@
 # Restaurant-System
 # Despliegue
-HTML + JavaScript +LocalStorage 
-Preparado para subir a github pages 
+HTML + JavaScript + LocalStorage. No requiere build.
+
+## Ejecucion local
+1. Abre `index.html` en el navegador.
+2. (Opcional) Usa Live Server si deseas recarga automatica.
+
+## GitHub Pages
+1. Sube el repositorio a GitHub.
+2. Ve a **Settings > Pages**.
+3. En **Source**, selecciona **Deploy from branch**.
+4. Elige **main** y **/ (root)**, guarda los cambios.
+5. Accede a la URL publicada por GitHub Pages.
+
+## Manual de usuario
+Consulta `MANUAL_USUARIO.md` para el flujo completo del sistema.
 
 # LocalStorage
 Qué es: Es un espacio de almacenamiento en el navegador (del lado del cliente).
@@ -14,19 +27,19 @@ O si tu código lo borra explícitamente con localStorage.clear() o localStorage
 ## Requerimientos
 ## REQUERIMIENTOS FUNCIONALES (RF)
 
-### Gestión de Catálogo hecho
+### Gestión de Catálogo 
 - **RF-01 (CRUD Catálogo):** El sistema permite crear, listar, actualizar(editar) y eliminar productos del catalogo.
     - Cada producto requiere: `ID`, `Nombre`, 'precio'(Decimal), 'disponibilidad' (bool), 'descripcion'(String), 'estado' (bool) TODOS, precio incluye impuestos
     - Un producto no puede ser eliminado si tiene comandas históricas vinculadas, para eso existe estado
     
 
-### Gestión de Mesas hecho
+### Gestión de Mesas 
 - **RF-02 (Creacion de Mesas):** Creacion de mesas.
     - Cada mesa requiere: `ID`, `Numero`, 'capacidad'(Int), disponibilidad(bool), estado (Disponibilidad-estado necesario para gestionarla mas no al momento de creacion- automatica disponible), estado (activa deshabilitada - igual desde configuracion de lista, activa por defecto en la creacion)
 - **RF-03 (Estado de Mesas):** Gestión de mesas con estados `LIBRE` u `OCUPADA`.
 - **RF-04 (Integridad):** Una mesa no puede ser marcada como `OCUPADA` si ya tiene una orden activa.
 
-### Gestión de Meseros hecho
+### Gestión de Meseros 
 - **RF-05 (Creacion de Meseros):** El sistema permite crear, listar, actualizar(editar), eliminar y desactivar meseros del sistema.
     - Cada mesero requiere: `ID`, `Nombre`, 'DNI'(Int), 'telefono'(Int), 'estado' (bool)
 - **RF-06 (Integridad):**Un mesero no puede ser eliminado si tiene comandas históricas vinculadas, para eso existe estado (Activo, Inactivo)

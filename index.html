@@ -3,171 +3,537 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Restaurant System - CRUD Meseros y Mesas</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>RestSystem</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+      .tab-button.active {
+        background: #d0e1fb;
+        color: #54647a;
+      }
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c6c6cd",
+              "tertiary-fixed": "#fcdeb5",
+              "tertiary-fixed-dim": "#dec29a",
+              "on-error-container": "#93000a",
+              "on-secondary-container": "#54647a",
+              "on-primary-container": "#7c839b",
+              "primary-fixed": "#dae2fd",
+              surface: "#fcf8fa",
+              "on-secondary-fixed-variant": "#38485d",
+              background: "#fcf8fa",
+              "inverse-primary": "#bec6e0",
+              "on-surface-variant": "#45464d",
+              "on-secondary-fixed": "#0b1c30",
+              error: "#ba1a1a",
+              "on-tertiary": "#ffffff",
+              "secondary-container": "#d0e1fb",
+              "on-background": "#1b1b1d",
+              "on-tertiary-fixed-variant": "#574425",
+              "surface-container": "#f0edef",
+              "on-primary-fixed-variant": "#3f465c",
+              outline: "#76777d",
+              "secondary-fixed": "#d3e4fe",
+              "surface-container-low": "#f6f3f5",
+              secondary: "#505f76",
+              "on-tertiary-container": "#98805d",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#bec6e0",
+              "on-surface": "#1b1b1d",
+              "surface-tint": "#565e74",
+              tertiary: "#000000",
+              "on-tertiary-fixed": "#271901",
+              "surface-container-high": "#eae7e9",
+              "on-secondary": "#ffffff",
+              primary: "#000000",
+              "surface-dim": "#dcd9db",
+              "on-primary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e4e2e4",
+              "inverse-on-surface": "#f3f0f2",
+              "surface-bright": "#fcf8fa",
+              "on-error": "#ffffff",
+              "on-primary-fixed": "#131b2e",
+              "surface-variant": "#e4e2e4",
+              "primary-container": "#131b2e",
+              "secondary-fixed-dim": "#b7c8e1",
+              "inverse-surface": "#303032",
+              "tertiary-container": "#271901",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            spacing: {
+              md: "16px",
+              base: "4px",
+              xl: "32px",
+              xs: "8px",
+              sm: "12px",
+              "sidebar-width": "320px",
+              lg: "24px",
+              gutter: "16px",
+            },
+            fontFamily: {
+              "body-lg": ["Inter"],
+              "headline-sm": ["Inter"],
+              "data-mono": ["JetBrains Mono"],
+              display: ["Inter"],
+              "label-md": ["Inter"],
+              "headline-md": ["Inter"],
+              "body-md": ["Inter"],
+            },
+            fontSize: {
+              "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+              "data-mono": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+              display: [
+                "30px",
+                {
+                  lineHeight: "38px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "label-md": [
+                "12px",
+                { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" },
+              ],
+              "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+              "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <header class="app-header">
-      <h1>Restaurant System</h1>
-      <p> Gestion de organizacion (Meseros y mesas)</p>
+  <body class="bg-surface text-on-surface font-body-md overflow-hidden">
+    <header
+      class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface border-b border-outline-variant"
+    >
+      <div class="flex items-center gap-md">
+        <span class="font-headline-md text-headline-md font-bold text-primary"
+          >RestSystem</span
+        >
+      </div>
     </header>
 
-    <main class="app-main">
-      <nav class="tab-buttons" aria-label="Pestañas">
-        <button class="tab-button active" type="button" data-tab="mesas">
+    <aside
+      class="fixed left-0 top-0 h-full flex flex-col p-md z-40 bg-surface-container border-r border-outline-variant w-sidebar-width pt-20"
+    >
+      <nav class="flex-1 flex flex-col gap-xs">
+        <button
+          class="tab-button active flex items-center gap-md px-md py-sm rounded-xl font-label-md transition-all"
+          type="button"
+          data-tab="dashboard"
+        >
+          <span class="material-symbols-outlined">dashboard</span>
+          Dashboard
+        </button>
+        <button
+          class="tab-button flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl font-label-md transition-all"
+          type="button"
+          data-tab="catalogo"
+        >
+          <span class="material-symbols-outlined">menu_book</span>
+          Catalogo
+        </button>
+        <button
+          class="tab-button flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl font-label-md transition-all"
+          type="button"
+          data-tab="mesas"
+        >
+          <span class="material-symbols-outlined">table_restaurant</span>
           Mesas
         </button>
-        <button class="tab-button" type="button" data-tab="meseros">
+        <button
+          class="tab-button flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl font-label-md transition-all"
+          type="button"
+          data-tab="meseros"
+        >
+          <span class="material-symbols-outlined">badge</span>
           Meseros
         </button>
-        <button class="tab-button" type="button" data-tab="catalogo">
-          Catalogo de Productos
-        </button>
       </nav>
+      <button
+        class="mt-xl w-full py-md bg-primary text-on-primary font-bold rounded-lg flex justify-center items-center gap-sm active:opacity-80 transition-opacity"
+        type="button"
+      >
+        <span class="material-symbols-outlined">add</span>
+        Nuevo turno
+      </button>
+      <div class="mt-auto border-t border-outline-variant pt-md space-y-base">
 
-      <section class="tab-panel active" data-tab="mesas">
-        <div class="card" aria-labelledby="mesas-title">
-        <div class="card-header">
-          <h2 id="mesas-title">Mesas</h2>
-          <button id="mesa-reset" class="secondary" type="button">Limpiar datos</button>
-        </div>
+      </div>
+    </aside>
 
-        <form id="mesa-form" class="form-grid">
-          <label>
-            Numero
-            <input id="mesa-numero" name="mesa-numero" type="number" min="1" step="1" required />
-          </label>
-          <label>
-            Capacidad
-            <input id="mesa-capacidad" name="mesa-capacidad" type="number" min="1" step="1" required />
-          </label>
-          <label>
-            Estado
-            <select id="mesa-estado" name="mesa-estado" required>
-              <option value="LIBRE">LIBRE</option>
-              <option value="OCUPADA">OCUPADA</option>
-              <option value="DESHABILITADA">DESHABILITADA</option>
-            </select>
-          </label>
-          <div class="form-actions">
-            <button id="mesa-submit" type="submit">Guardar</button>
-            <button id="mesa-cancel" class="secondary" type="button">Cancelar</button>
+    <main class="ml-sidebar-width pt-20 px-lg h-screen overflow-y-auto pb-lg">
+      <section class="tab-panel active" data-tab="dashboard">
+        <header class="flex justify-between items-end mb-lg">
+          <div>
+            <p class="font-label-md text-label-md text-on-surface-variant mb-base">
+              DASHBOARD
+            </p>
+            <h2 class="font-display text-display text-on-surface">Floor View</h2>
           </div>
-        </form>
-
-        <div id="mesa-errors" class="form-errors" role="alert" aria-live="polite"></div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Numero</th>
-                <th>Capacidad</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="mesa-body"></tbody>
-          </table>
-          <p id="mesa-empty" class="empty-state">Sin mesas registradas.</p>
-        </div>
-
-        <details class="validation-details">
-          <summary>Validaciones aplicadas</summary>
-          <ul>
-            <li>ID obligatorio, unico, con letras, numeros, guion o guion bajo.</li>
-            <li>Numero obligatorio, entero y unico.</li>
-            <li>Capacidad obligatoria, rango 1 a 99.</li>
-            <li>Estado solo LIBRE, OCUPADA o DESHABILITADA.</li>
-            <li>No se permite eliminar mesas con ordenes asociadas.</li>
-            <li>No se permite marcar OCUPADA si ya existe una orden activa.</li>
-          </ul>
-        </details>
-        </div>
-      </section>
-
-      <section class="tab-panel" data-tab="meseros">
-        <div class="card" aria-labelledby="meseros-title">
-        <div class="card-header">
-          <h2 id="meseros-title">Meseros</h2>
-          <button id="mesero-reset" class="secondary" type="button">Limpiar datos</button>
-        </div>
-
-        <form id="mesero-form" class="form-grid">
-          <label>
-            Nombre Completo
-            <input id="mesero-nombre" name="mesero-nombre" type="text" autocomplete="off" required />
-          </label>
-          <label>
-            DNI
-            <input id="mesero-dni" name="mesero-dni" type="text" inputmode="numeric" autocomplete="off" required />
-          </label>
-          <label>
-            Telefono
-            <input id="mesero-telefono" name="mesero-telefono" type="text" inputmode="numeric" autocomplete="off" required />
-          </label>
-          <label>
-            Estado
-            <select id="mesero-estado" name="mesero-estado" required>
-              <option value="ACTIVO">ACTIVO</option>
-              <option value="INACTIVO">INACTIVO</option>
-            </select>
-          </label>
-          <div class="form-actions">
-            <button id="mesero-submit" type="submit">Guardar</button>
-            <button id="mesero-cancel" class="secondary" type="button">Cancelar</button>
+          <div class="flex gap-sm">
+            <div
+              class="flex items-center gap-xs px-sm py-xs bg-surface-container-highest rounded border border-outline-variant"
+            >
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span class="font-label-md text-label-md" id="dashboard-mesa-libre"
+                >0 LIBRE</span
+              >
+            </div>
+            <div
+              class="flex items-center gap-xs px-sm py-xs bg-surface-container-highest rounded border border-outline-variant"
+            >
+              <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+              <span class="font-label-md text-label-md" id="dashboard-mesa-ocupada"
+                >0 OCUPADA</span
+              >
+            </div>
+            <div
+              class="flex items-center gap-xs px-sm py-xs bg-surface-container-highest rounded border border-outline-variant"
+            >
+              <div class="w-3 h-3 bg-surface-variant rounded-full"></div>
+              <span
+                class="font-label-md text-label-md"
+                id="dashboard-mesa-deshabilitada"
+                >0 DESHABILITADA</span
+              >
+            </div>
           </div>
-        </form>
+        </header>
 
-        <div id="mesero-errors" class="form-errors" role="alert" aria-live="polite"></div>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter"
+          id="dashboard-table-grid"
+        ></div>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>DNI</th>
-                <th>Telefono</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="mesero-body"></tbody>
-          </table>
-          <p id="mesero-empty" class="empty-state">Sin meseros registrados.</p>
-        </div>
+        <section class="mt-xl grid grid-cols-12 gap-lg">
+          <div class="col-span-12 lg:col-span-5 space-y-lg">
+            <div
+              class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg"
+            >
+              <div class="flex items-center justify-between mb-md">
+                <h3 class="font-headline-sm text-headline-sm">
+                  Gestion de Ordenes
+                </h3>
+                <button
+                  id="orden-reset"
+                  class="px-sm py-xs border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+                  type="button"
+                >
+                  Limpiar datos
+                </button>
+              </div>
 
-        <details class="validation-details">
-          <summary>Validaciones aplicadas</summary>
-          <ul>
-            <li>ID obligatorio, unico, con letras, numeros, guion o guion bajo.</li>
-            <li>Nombre obligatorio y alfanumerico con espacios.</li>
-            <li>DNI obligatorio, numerico y de 8 digitos.</li>
-            <li>Telefono obligatorio, numerico y de 6 a 15 digitos.</li>
-            <li>Estado solo ACTIVO o INACTIVO.</li>
-            <li>No se permite eliminar meseros con ordenes asociadas.</li>
-          </ul>
-        </details>
-        </div>
+              <form id="orden-form" class="grid gap-md">
+                <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+                  ID
+                  <input
+                    id="orden-id"
+                    name="orden-id"
+                    type="text"
+                    readonly
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  />
+                </label>
+                <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+                  Tipo
+                  <select
+                    id="orden-tipo"
+                    name="orden-tipo"
+                    required
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  >
+                    <option value="MESA">MESA</option>
+                    <option value="PARA_LLEVAR">PARA LLEVAR</option>
+                  </select>
+                </label>
+                <label
+                  data-order-field="mesa"
+                  class="flex flex-col gap-xs text-label-md text-on-surface-variant"
+                >
+                  Mesa
+                  <select
+                    id="orden-mesa"
+                    name="orden-mesa"
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  >
+                    <option value="">Seleccione</option>
+                  </select>
+                </label>
+                <label
+                  data-order-field="mesero"
+                  class="flex flex-col gap-xs text-label-md text-on-surface-variant"
+                >
+                  Mesero
+                  <select
+                    id="orden-mesero"
+                    name="orden-mesero"
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  >
+                    <option value="">Seleccione</option>
+                  </select>
+                </label>
+                <label
+                  data-order-field="cliente"
+                  class="flex flex-col gap-xs text-label-md text-on-surface-variant"
+                >
+                  Nombre para llevar
+                  <input
+                    id="orden-cliente"
+                    name="orden-cliente"
+                    type="text"
+                    autocomplete="off"
+                    maxlength="60"
+                    pattern="[A-Za-z0-9 _-]+"
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  />
+                </label>
+                <div class="flex gap-sm">
+                  <button
+                    id="orden-submit"
+                    class="flex-1 py-sm bg-primary text-on-primary rounded-lg font-label-md"
+                    type="submit"
+                  >
+                    Crear orden
+                  </button>
+                  <button
+                    id="orden-cancel"
+                    class="flex-1 py-sm border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+                    type="button"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+
+              <div
+                id="orden-errors"
+                class="text-error text-body-md min-h-[20px] mt-sm"
+                role="alert"
+                aria-live="polite"
+              ></div>
+            </div>
+
+            <div
+              class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg"
+            >
+              <h3 class="font-headline-sm text-headline-sm mb-md">
+                Items de Orden
+              </h3>
+              <form id="orden-item-form" class="grid gap-md">
+                <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+                  Orden
+                  <select
+                    id="orden-item-orden"
+                    name="orden-item-orden"
+                    required
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  >
+                    <option value="">Seleccione</option>
+                  </select>
+                </label>
+                <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+                  Producto
+                  <select
+                    id="orden-item-producto"
+                    name="orden-item-producto"
+                    required
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  >
+                    <option value="">Seleccione</option>
+                  </select>
+                </label>
+                <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+                  Cantidad
+                  <input
+                    id="orden-item-cantidad"
+                    name="orden-item-cantidad"
+                    type="number"
+                    min="1"
+                    max="99"
+                    step="1"
+                    required
+                    class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                  />
+                </label>
+                <button
+                  id="orden-item-submit"
+                  class="py-sm bg-primary text-on-primary rounded-lg font-label-md"
+                  type="submit"
+                >
+                  Agregar item
+                </button>
+              </form>
+
+              <div
+                id="orden-item-errors"
+                class="text-error text-body-md min-h-[20px] mt-sm"
+                role="alert"
+                aria-live="polite"
+              ></div>
+            </div>
+          </div>
+
+          <div class="col-span-12 lg:col-span-7">
+            <div
+              class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+            >
+              <div class="p-md border-b border-outline-variant">
+                <h3 class="font-headline-sm text-headline-sm">
+                  Ordenes activas e historicas
+                </h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-surface-container-low border-b border-outline-variant">
+                    <tr>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        ID
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Tipo
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Mesa
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Mesero
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Cliente
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Estado
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Items
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Total
+                      </th>
+                      <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                        Acciones
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline-variant" id="orden-body"></tbody>
+                </table>
+              </div>
+              <p
+                id="orden-empty"
+                class="text-on-surface-variant text-body-md px-md py-sm"
+              >
+                Sin ordenes registradas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-xl">
+          <div
+            class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+          >
+            <div class="p-md border-b border-outline-variant">
+              <h3 class="font-headline-sm text-headline-sm">Meseros en servicio</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-container-low border-b border-outline-variant">
+                  <tr>
+                    <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                      ID
+                    </th>
+                    <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                      Nombre
+                    </th>
+                    <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                      Estado
+                    </th>
+                    <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                      Ordenes activas
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="divide-y divide-outline-variant"
+                  id="dashboard-mesero-body"
+                ></tbody>
+              </table>
+            </div>
+            <p
+              id="dashboard-mesero-empty"
+              class="text-on-surface-variant text-body-md px-md py-sm"
+            >
+              Sin meseros registrados.
+            </p>
+          </div>
+        </section>
       </section>
 
       <section class="tab-panel" data-tab="catalogo">
-        <div class="card" aria-labelledby="catalogo-title">
-          <div class="card-header">
-            <h2 id="catalogo-title">Catalogo de Productos</h2>
-            <button id="producto-reset" class="secondary" type="button">
-              Limpiar datos
-            </button>
+        <header class="flex justify-between items-end mb-lg">
+          <div>
+            <p class="font-label-md text-label-md text-on-surface-variant mb-base">
+              CATALOGO
+            </p>
+            <h2 class="font-display text-display text-on-surface">
+              Gestion de productos
+            </h2>
           </div>
+          <button
+            id="producto-reset"
+            class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md"
+            type="button"
+          >
+            Limpiar datos
+          </button>
+        </header>
 
-          <form id="producto-form" class="form-grid">
-            <label>
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg"
+        >
+          <form id="producto-form" class="grid gap-md md:grid-cols-2">
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               ID
-              <input id="producto-id" name="producto-id" type="text" autocomplete="off" required />
+              <input
+                id="producto-id"
+                name="producto-id"
+                type="text"
+                autocomplete="off"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
             </label>
-            <label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               Nombre
               <input
                 id="producto-nombre"
@@ -175,9 +541,10 @@
                 type="text"
                 autocomplete="off"
                 required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
               />
             </label>
-            <label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               Precio (incluye impuestos)
               <input
                 id="producto-precio"
@@ -186,72 +553,393 @@
                 min="0.01"
                 step="0.01"
                 required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
               />
             </label>
-            <label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               Disponibilidad
-              <select id="producto-disponibilidad" name="producto-disponibilidad" required>
+              <select
+                id="producto-disponibilidad"
+                name="producto-disponibilidad"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              >
                 <option value="true">DISPONIBLE</option>
                 <option value="false">NO DISPONIBLE</option>
               </select>
             </label>
-            <label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               Estado
-              <select id="producto-estado" name="producto-estado" required>
+              <select
+                id="producto-estado"
+                name="producto-estado"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              >
                 <option value="true">ACTIVO</option>
                 <option value="false">INACTIVO</option>
               </select>
             </label>
-            <label class="full-width">
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant md:col-span-2">
               Descripcion
               <textarea
                 id="producto-descripcion"
                 name="producto-descripcion"
                 rows="3"
                 required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
               ></textarea>
             </label>
-            <div class="form-actions">
-              <button id="producto-submit" type="submit">Guardar</button>
-              <button id="producto-cancel" class="secondary" type="button">Cancelar</button>
+            <div class="flex gap-sm md:col-span-2">
+              <button
+                id="producto-submit"
+                class="flex-1 py-sm bg-primary text-on-primary rounded-lg font-label-md"
+                type="submit"
+              >
+                Guardar
+              </button>
+              <button
+                id="producto-cancel"
+                class="flex-1 py-sm border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+                type="button"
+              >
+                Cancelar
+              </button>
             </div>
           </form>
 
-          <div id="producto-errors" class="form-errors" role="alert" aria-live="polite"></div>
+          <div
+            id="producto-errors"
+            class="text-error text-body-md min-h-[20px] mt-sm"
+            role="alert"
+            aria-live="polite"
+          ></div>
+        </div>
 
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Disponibilidad</th>
-                  <th>Estado</th>
-                  <th>Descripcion</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="producto-body"></tbody>
-            </table>
-            <p id="producto-empty" class="empty-state">Sin productos registrados.</p>
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+        >
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-container-low border-b border-outline-variant">
+              <tr>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  ID
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Nombre
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Precio
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Disponibilidad
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Estado
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Descripcion
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant" id="producto-body"></tbody>
+          </table>
+          <p
+            id="producto-empty"
+            class="text-on-surface-variant text-body-md px-md py-sm"
+          >
+            Sin productos registrados.
+          </p>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="mesas">
+        <header class="flex justify-between items-end mb-lg">
+          <div>
+            <p class="font-label-md text-label-md text-on-surface-variant mb-base">
+              MESAS
+            </p>
+            <h2 class="font-display text-display text-on-surface">
+              Gestion de mesas
+            </h2>
           </div>
+          <button
+            id="mesa-reset"
+            class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md"
+            type="button"
+          >
+            Limpiar datos
+          </button>
+        </header>
 
-          <details class="validation-details">
-            <summary>Validaciones aplicadas</summary>
-            <ul>
-              <li>ID obligatorio, unico, con letras, numeros, guion o guion bajo.</li>
-              <li>Nombre obligatorio y alfanumerico con espacios.</li>
-              <li>Precio obligatorio y mayor a 0.</li>
-              <li>Disponibilidad y estado solo admiten valores booleanos.</li>
-              <li>No se permite eliminar productos con ordenes historicas; se marca INACTIVO.</li>
-            </ul>
-          </details>
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg"
+        >
+          <form id="mesa-form" class="grid gap-md md:grid-cols-2">
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              ID
+              <input
+                id="mesa-id"
+                name="mesa-id"
+                type="text"
+                autocomplete="off"
+                pattern="[A-Za-z0-9_-]+"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Numero
+              <input
+                id="mesa-numero"
+                name="mesa-numero"
+                type="number"
+                min="1"
+                step="1"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Capacidad
+              <input
+                id="mesa-capacidad"
+                name="mesa-capacidad"
+                type="number"
+                min="1"
+                step="1"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Estado
+              <select
+                id="mesa-estado"
+                name="mesa-estado"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              >
+                <option value="LIBRE">LIBRE</option>
+                <option value="OCUPADA">OCUPADA</option>
+                <option value="DESHABILITADA">DESHABILITADA</option>
+              </select>
+            </label>
+            <div class="flex gap-sm md:col-span-2">
+              <button
+                id="mesa-submit"
+                class="flex-1 py-sm bg-primary text-on-primary rounded-lg font-label-md"
+                type="submit"
+              >
+                Guardar
+              </button>
+              <button
+                id="mesa-cancel"
+                class="flex-1 py-sm border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+                type="button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          <div
+            id="mesa-errors"
+            class="text-error text-body-md min-h-[20px] mt-sm"
+            role="alert"
+            aria-live="polite"
+          ></div>
+        </div>
+
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+        >
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-container-low border-b border-outline-variant">
+              <tr>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  ID
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Numero
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Capacidad
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Estado
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant" id="mesa-body"></tbody>
+          </table>
+          <p
+            id="mesa-empty"
+            class="text-on-surface-variant text-body-md px-md py-sm"
+          >
+            Sin mesas registradas.
+          </p>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="meseros">
+        <header class="flex justify-between items-end mb-lg">
+          <div>
+            <p class="font-label-md text-label-md text-on-surface-variant mb-base">
+              MESEROS
+            </p>
+            <h2 class="font-display text-display text-on-surface">
+              Gestion de meseros
+            </h2>
+          </div>
+          <button
+            id="mesero-reset"
+            class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md"
+            type="button"
+          >
+            Limpiar datos
+          </button>
+        </header>
+
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg"
+        >
+          <form id="mesero-form" class="grid gap-md md:grid-cols-2">
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              ID
+              <input
+                id="mesero-id"
+                name="mesero-id"
+                type="text"
+                autocomplete="off"
+                pattern="[A-Za-z0-9_-]+"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Nombre Completo
+              <input
+                id="mesero-nombre"
+                name="mesero-nombre"
+                type="text"
+                autocomplete="off"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              DNI
+              <input
+                id="mesero-dni"
+                name="mesero-dni"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Telefono
+              <input
+                id="mesero-telefono"
+                name="mesero-telefono"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              />
+            </label>
+            <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
+              Estado
+              <select
+                id="mesero-estado"
+                name="mesero-estado"
+                required
+                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+              >
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </label>
+            <div class="flex gap-sm md:col-span-2">
+              <button
+                id="mesero-submit"
+                class="flex-1 py-sm bg-primary text-on-primary rounded-lg font-label-md"
+                type="submit"
+              >
+                Guardar
+              </button>
+              <button
+                id="mesero-cancel"
+                class="flex-1 py-sm border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+                type="button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          <div
+            id="mesero-errors"
+            class="text-error text-body-md min-h-[20px] mt-sm"
+            role="alert"
+            aria-live="polite"
+          ></div>
+        </div>
+
+        <div
+          class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+        >
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-container-low border-b border-outline-variant">
+              <tr>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  ID
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Nombre
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  DNI
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Telefono
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Estado
+                </th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant" id="mesero-body"></tbody>
+          </table>
+          <p
+            id="mesero-empty"
+            class="text-on-surface-variant text-body-md px-md py-sm"
+          >
+            Sin meseros registrados.
+          </p>
         </div>
       </section>
     </main>
 
-    <div id="global-error" class="global-error" role="alert" aria-live="polite"></div>
+    <div
+      id="global-error"
+      class="text-error font-label-md px-lg py-sm"
+      role="alert"
+      aria-live="polite"
+    ></div>
 
     <script src="app.js"></script>
   </body>
