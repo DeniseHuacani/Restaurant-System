@@ -118,16 +118,159 @@ function saveList(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+/**
+ * Inyecta datos de prueba iniciales (Mock Data).
+ * Esta función solo se invoca si el sistema detecta que no hay datos previos.
+ */
+function seedMockData() {
+    
+    const mockMesas = [
+      { id: "M1", numero: 1, capacidad: 4, estado: "LIBRE", habilitada: true },
+      { id: "M2", numero: 2, capacidad: 2, estado: "LIBRE", habilitada: true },
+      { id: "M3", numero: 3, capacidad: 6, estado: "LIBRE", habilitada: true },
+      { id: "M4", numero: 4, capacidad: 4, estado: "LIBRE", habilitada: true },
+    ];
+    saveList(STORAGE_KEYS.mesas, mockMesas);
+
+    const mockMeseros = [
+      { id: "W1", nombre: "Juan Perez", dni: "12345678", telefono: "987654321", estado: "ACTIVO" },
+      { id: "W2", nombre: "Maria Garcia", dni: "87654321", telefono: "912345678", estado: "ACTIVO" },
+      { id: "W3", nombre: "Pedro Rodriguez", dni: "45678912", telefono: "945612378", estado: "ACTIVO" },
+    ];
+    saveList(STORAGE_KEYS.meseros, mockMeseros);
+
+    
+    const mockProductos = [
+      // --- ENTRADAS Y ENTRANTES ---
+      { 
+        id: "P1", 
+        nombre: "Rocoto Relleno con Pastel de Papa", 
+        precio: "28.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Rocoto desvenado relleno de carne picada a cuchillo, pasas y aceituna, cubierto de queso derretido y acompañado de su clásico pastel de papa horneado." 
+      },
+      { 
+        id: "P2", 
+        nombre: "Solterito de Queso", 
+        precio: "18.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Ensalada fresca y colorida de habas tiernas, choclo desgranado, queso fresco en cubos, aceitunas negras, tomate y cebolla, aliñada con aceite y vinagre." 
+      },
+      { 
+        id: "P3", 
+        nombre: "Ocopa Tradicional", 
+        precio: "16.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Rodajas de papas sancochadas bañadas en una cremosa salsa de huacatay, maní y queso, hecha en batán. Acompañada de huevo duro y aceituna." 
+      },
+      { 
+        id: "P4", 
+        nombre: "Escribano", 
+        precio: "14.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Papas machacadas con tomate, rocoto picadito, vinagre y un chorro de aceite." 
+      },
+
+      // --- LOS SEGUNDOS Y PICANTES ---
+      { 
+        id: "P5", 
+        nombre: "Cuy Chactado", 
+        precio: "55.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Cuy entero tierno, aderezado y frito bajo el peso de una piedra de batán hasta quedar perfectamente crocante. Servido con papas doradas y ensalada." 
+      },
+      { 
+        id: "P6", 
+        nombre: "Costillar Dorado", 
+        precio: "42.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Costilla de cordero de leche, sazonada con ají y ajo, frita hasta quedar doradita por fuera y jugosa por dentro. Viene con papas fritas y ensalada criolla." 
+      },
+      { 
+        id: "P7", 
+        nombre: "Malaya Frita", 
+        precio: "38.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Falda de res sancochada con especias y luego dorada a la sartén. Se sirve con papas doradas y una buena porción de sarza de cebolla." 
+      },
+      { 
+        id: "P8", 
+        nombre: "El Triple Picantero", 
+        precio: "45.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Combinado de tres clásicos en un solo plato: Rocoto relleno, Pastel de papa y un picante del día (Matasquita o Ají de calabaza)." 
+      },
+
+      // --- BEBIDAS ---
+      { 
+        id: "P9", 
+        nombre: "Chicha de Jora (Caporal)", 
+        precio: "8.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Néctar de maíz fermentado artesanalmente. El maridaje obligatorio de toda picantería." 
+      },
+      { 
+        id: "P10", 
+        nombre: "Chicha Morada Helada (Jarra)", 
+        precio: "15.00", 
+        disponibilidad: true, 
+        estado: true, 
+        descripcion: "Preparada en casa con maíz morado, piña, membrillo, manzana y un toque de limón." 
+      }
+    ];
+
+    saveList(STORAGE_KEYS.productos, mockProductos);
+    console.log("✅ [SEED] Productos iniciales guardados.");
+
+}
+
 function initState() {
   try {
-    state.mesas = loadList(STORAGE_KEYS.mesas).map(ensureMesaDefaults);
-    state.meseros = loadList(STORAGE_KEYS.meseros);
-    state.ordenes = loadList(STORAGE_KEYS.ordenes).map(ensureOrderDefaults);
-    state.productos = loadList(STORAGE_KEYS.productos);
+    // 1. CONTROL DE PERSISTENCIA REAL: Verificar si el almacenamiento no existe o tiene arreglos vacíos
+    let isAppEmpty = false;
+    try {
+      isAppEmpty = loadList(STORAGE_KEYS.mesas).length === 0 || 
+                   loadList(STORAGE_KEYS.meseros).length === 0 || 
+                   loadList(STORAGE_KEYS.productos).length === 0;
+    } catch (e) {
+      isAppEmpty = true; // Si hay error de formato, tratamos como vacío para regenerar
+    }
+
+
+    // 2. CARGA DINÁMICA CON TRAZABILIDAD
+    try {
+      state.mesas = loadList(STORAGE_KEYS.mesas).map(ensureMesaDefaults);
+    } catch (e) { console.error("❌ [ERROR] Fallo al cargar Mesas:", e); }
+
+    try {
+      state.meseros = loadList(STORAGE_KEYS.meseros);
+    } catch (e) { console.error("❌ [ERROR] Fallo al cargar Meseros:", e); }
+
+    try {
+      state.productos = loadList(STORAGE_KEYS.productos);
+    } catch (e) { console.error("❌ [ERROR] Fallo al cargar Productos:", e); }
+
+    try {
+      state.ordenes = loadList(STORAGE_KEYS.ordenes).map(ensureOrderDefaults);
+    } catch (e) { console.error("❌ [ERROR] Fallo al cargar Órdenes:", e); }
+
+    // 3. DISPARAR RENDERIZADO INICIAL
+    renderAll();
+
   } catch (error) {
     state.loadError = error.message;
-    globalError.textContent =
-      `${error.message} Corrige LocalStorage o usa "Limpiar datos" para reiniciar.`;
+    if (globalError) {
+      globalError.textContent = `Error crítico: ${error.message}. Revisa la consola (F12).`;
+    }
   }
 }
 
@@ -1725,17 +1868,37 @@ function bindEvents() {
 }
 
 function renderAll() {
-  renderMesas();
-  renderMeseros();
-  renderProductos();
-  renderOrdenes();
-  resetOrdenForm();
-  resetOrdenItemForm();
+  try {
+    renderMesas();
+  } catch (e) { console.error("❌ [ERROR] Fallo en renderMesas:", e); }
+
+  try {
+    renderMeseros();
+  } catch (e) { console.error("❌ [ERROR] Fallo en renderMeseros:", e); }
+
+  try {
+    renderProductos();
+  } catch (e) { console.error("❌ [ERROR] Fallo en renderProductos:", e); }
+
+  try {
+    renderOrdenes();
+  } catch (e) { console.error("❌ [ERROR] Fallo en renderOrdenes:", e); }
+
+  try {
+    resetOrdenForm();
+    resetOrdenItemForm();
+  } catch (e) { console.error("❌ [ERROR] Fallo al resetear formularios:", e); }
 }
 
-initState();
-bindEvents();
-renderAll();
-if (state.loadError) {
-  setFormDisabled(true);
-}
+// 1. EVENTO DE CARGA (DOMContentLoaded):
+// Garantiza que el HTML esté listo antes de ejecutar la lógica de inicialización.
+document.addEventListener("DOMContentLoaded", () => {
+  // Inicializa los datos (y dispara el renderizado interno)
+  initState();
+  // Vincula los eventos de los formularios y botones
+  bindEvents();
+
+  if (state.loadError) {
+    setFormDisabled(true);
+  }
+});
