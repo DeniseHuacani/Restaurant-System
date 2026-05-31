@@ -13,7 +13,20 @@
     </header>
 
     <main class="app-main">
-      <section class="card" aria-labelledby="mesas-title">
+      <nav class="tab-buttons" aria-label="Pestañas">
+        <button class="tab-button active" type="button" data-tab="mesas">
+          Mesas
+        </button>
+        <button class="tab-button" type="button" data-tab="meseros">
+          Meseros
+        </button>
+        <button class="tab-button" type="button" data-tab="catalogo">
+          Catalogo de Productos
+        </button>
+      </nav>
+
+      <section class="tab-panel active" data-tab="mesas">
+        <div class="card" aria-labelledby="mesas-title">
         <div class="card-header">
           <h2 id="mesas-title">Mesas</h2>
           <button id="mesa-reset" class="secondary" type="button">Limpiar datos</button>
@@ -33,6 +46,7 @@
             <select id="mesa-estado" name="mesa-estado" required>
               <option value="LIBRE">LIBRE</option>
               <option value="OCUPADA">OCUPADA</option>
+              <option value="DESHABILITADA">DESHABILITADA</option>
             </select>
           </label>
           <div class="form-actions">
@@ -65,14 +79,16 @@
             <li>ID obligatorio, unico, con letras, numeros, guion o guion bajo.</li>
             <li>Numero obligatorio, entero y unico.</li>
             <li>Capacidad obligatoria, rango 1 a 99.</li>
-            <li>Estado solo LIBRE u OCUPADA.</li>
+            <li>Estado solo LIBRE, OCUPADA o DESHABILITADA.</li>
             <li>No se permite eliminar mesas con ordenes asociadas.</li>
             <li>No se permite marcar OCUPADA si ya existe una orden activa.</li>
           </ul>
         </details>
+        </div>
       </section>
 
-      <section class="card" aria-labelledby="meseros-title">
+      <section class="tab-panel" data-tab="meseros">
+        <div class="card" aria-labelledby="meseros-title">
         <div class="card-header">
           <h2 id="meseros-title">Meseros</h2>
           <button id="mesero-reset" class="secondary" type="button">Limpiar datos</button>
@@ -134,6 +150,104 @@
             <li>No se permite eliminar meseros con ordenes asociadas.</li>
           </ul>
         </details>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab="catalogo">
+        <div class="card" aria-labelledby="catalogo-title">
+          <div class="card-header">
+            <h2 id="catalogo-title">Catalogo de Productos</h2>
+            <button id="producto-reset" class="secondary" type="button">
+              Limpiar datos
+            </button>
+          </div>
+
+          <form id="producto-form" class="form-grid">
+            <label>
+              ID
+              <input id="producto-id" name="producto-id" type="text" autocomplete="off" required />
+            </label>
+            <label>
+              Nombre
+              <input
+                id="producto-nombre"
+                name="producto-nombre"
+                type="text"
+                autocomplete="off"
+                required
+              />
+            </label>
+            <label>
+              Precio (incluye impuestos)
+              <input
+                id="producto-precio"
+                name="producto-precio"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+              />
+            </label>
+            <label>
+              Disponibilidad
+              <select id="producto-disponibilidad" name="producto-disponibilidad" required>
+                <option value="true">DISPONIBLE</option>
+                <option value="false">NO DISPONIBLE</option>
+              </select>
+            </label>
+            <label>
+              Estado
+              <select id="producto-estado" name="producto-estado" required>
+                <option value="true">ACTIVO</option>
+                <option value="false">INACTIVO</option>
+              </select>
+            </label>
+            <label class="full-width">
+              Descripcion
+              <textarea
+                id="producto-descripcion"
+                name="producto-descripcion"
+                rows="3"
+                required
+              ></textarea>
+            </label>
+            <div class="form-actions">
+              <button id="producto-submit" type="submit">Guardar</button>
+              <button id="producto-cancel" class="secondary" type="button">Cancelar</button>
+            </div>
+          </form>
+
+          <div id="producto-errors" class="form-errors" role="alert" aria-live="polite"></div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Precio</th>
+                  <th>Disponibilidad</th>
+                  <th>Estado</th>
+                  <th>Descripcion</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="producto-body"></tbody>
+            </table>
+            <p id="producto-empty" class="empty-state">Sin productos registrados.</p>
+          </div>
+
+          <details class="validation-details">
+            <summary>Validaciones aplicadas</summary>
+            <ul>
+              <li>ID obligatorio, unico, con letras, numeros, guion o guion bajo.</li>
+              <li>Nombre obligatorio y alfanumerico con espacios.</li>
+              <li>Precio obligatorio y mayor a 0.</li>
+              <li>Disponibilidad y estado solo admiten valores booleanos.</li>
+              <li>No se permite eliminar productos con ordenes historicas; se marca INACTIVO.</li>
+            </ul>
+          </details>
+        </div>
       </section>
     </main>
 

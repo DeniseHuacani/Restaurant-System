@@ -14,35 +14,35 @@ O si tu código lo borra explícitamente con localStorage.clear() o localStorage
 ## Requerimientos
 ## REQUERIMIENTOS FUNCIONALES (RF)
 
-### Gestión de Catálogo
+### Gestión de Catálogo hecho
 - **RF-01 (CRUD Catálogo):** El sistema permite crear, listar, actualizar(editar) y eliminar productos del catalogo.
     - Cada producto requiere: `ID`, `Nombre`, 'precio'(Decimal), 'disponibilidad' (bool), 'descripcion'(String), 'estado' (bool) TODOS, precio incluye impuestos
     - Un producto no puede ser eliminado si tiene comandas históricas vinculadas, para eso existe estado
     
 
-### Gestión de Mesas
+### Gestión de Mesas hecho
 - **RF-02 (Creacion de Mesas):** Creacion de mesas.
-    - Cada mesa requiere: `ID`, `Numero`, 'capacidad'(Int)
+    - Cada mesa requiere: `ID`, `Numero`, 'capacidad'(Int), disponibilidad(bool), estado (Disponibilidad-estado necesario para gestionarla mas no al momento de creacion- automatica disponible), estado (activa deshabilitada - igual desde configuracion de lista, activa por defecto en la creacion)
 - **RF-03 (Estado de Mesas):** Gestión de mesas con estados `LIBRE` u `OCUPADA`.
 - **RF-04 (Integridad):** Una mesa no puede ser marcada como `OCUPADA` si ya tiene una orden activa.
 
-### Gestión de Meseros
+### Gestión de Meseros hecho
 - **RF-05 (Creacion de Meseros):** El sistema permite crear, listar, actualizar(editar), eliminar y desactivar meseros del sistema.
     - Cada mesero requiere: `ID`, `Nombre`, 'DNI'(Int), 'telefono'(Int), 'estado' (bool)
-- **RF-07 (Integridad):**Un mesero no puede ser eliminado si tiene comandas históricas vinculadas, para eso existe estado (Activo, Inactivo)
+- **RF-06 (Integridad):**Un mesero no puede ser eliminado si tiene comandas históricas vinculadas, para eso existe estado (Activo, Inactivo)
 
 ### Gestión de Ordenes
-- **RF-05 (Crear Orden):** Permite iniciar una orden seleccionando el tipo:(Mesa, Para Llevar)
+- **RF-07 (Crear Orden):** Permite iniciar una orden seleccionando el tipo:(Mesa, Para Llevar)
     - **Mesa:** Vincula a una mesa física.
     - **Mesero:** Vincula a un mesero a la orden
     - **Para Llevar:** Aplica automáticamente el costo de empaque definido en configuración. (0.40 centimos) sin mesa ni mesero, se tiene que ingresar un nombre para llevar.
-- **RF-05 (Gestión de Ítems):** Capacidad de añadir/remover ítems del catálogo a una orden abierta.
-- **RF-06 (Cálculo Total):** Ejecuta la sumatoria de ítems + costos adicionales (si aplica). Uso obligatorio de `Decimal`.
-- **RF-07 (Control de Estado - FSM):** Las órdenes siguen estrictamente el flujo: `PENDING` -> `PREPARING` -> `READY` -> `CLOSED`.
-- **RF-08 (Cierre Administrativo):** Al cerrar, la orden se vuelve inmutable y la mesa asociada se libera automáticamente.
+- **RF-08 (Gestión de Ítems):** Capacidad de añadir/remover ítems del catálogo a una orden abierta.
+- **RF-09 (Cálculo Total):** Ejecuta la sumatoria de ítems + costos adicionales (si aplica). Uso obligatorio de `Decimal`.
+- **RF-10 (Control de Estado - FSM):** Las órdenes siguen estrictamente el flujo: `PENDING` -> `PREPARING` -> `READY` -> `CLOSED`.
+- **RF-11 (Cierre Administrativo):** Al cerrar, la orden se vuelve inmutable y la mesa asociada se libera automáticamente.
 
 ### Visualización de datos
-- **RF-09 (Visualización de datos):** El sistema permite visualizar los datos de las mesas visualmente y meseros en tablas, se desgloza la orden y estado 
+- **RF-12 (Visualización de datos):** El sistema permite visualizar los datos de las mesas visualmente y meseros en tablas, se desgloza la orden y estado 
 
 ## 3. REQUERIMIENTOS NO FUNCIONALES (RNF)
 

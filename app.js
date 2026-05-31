@@ -2,14 +2,17 @@ const STORAGE_KEYS = {
   mesas: "mesas",
   meseros: "meseros",
   ordenes: "ordenes",
+  productos: "productos",
 };
 
 const state = {
   mesas: [],
   meseros: [],
   ordenes: [],
+  productos: [],
   editingMesaId: null,
   editingMeseroId: null,
+  editingProductoId: null,
   loadError: null,
 };
 
@@ -44,6 +47,21 @@ const meseroEstadoInput = document.getElementById("mesero-estado");
 const meseroCancelButton = document.getElementById("mesero-cancel");
 const meseroResetButton = document.getElementById("mesero-reset");
 
+const productoForm = document.getElementById("producto-form");
+const productoErrors = document.getElementById("producto-errors");
+const productoBody = document.getElementById("producto-body");
+const productoEmpty = document.getElementById("producto-empty");
+const productoIdInput = document.getElementById("producto-id");
+const productoNombreInput = document.getElementById("producto-nombre");
+const productoPrecioInput = document.getElementById("producto-precio");
+const productoDisponibilidadInput = document.getElementById(
+  "producto-disponibilidad"
+);
+const productoEstadoInput = document.getElementById("producto-estado");
+const productoDescripcionInput = document.getElementById("producto-descripcion");
+const productoCancelButton = document.getElementById("producto-cancel");
+const productoResetButton = document.getElementById("producto-reset");
+
 const globalError = document.getElementById("global-error");
 
 function loadList(key) {
@@ -68,9 +86,10 @@ function saveList(key, value) {
 
 function initState() {
   try {
-    state.mesas = loadList(STORAGE_KEYS.mesas);
+    state.mesas = loadList(STORAGE_KEYS.mesas).map(ensureMesaDefaults);
     state.meseros = loadList(STORAGE_KEYS.meseros);
     state.ordenes = loadList(STORAGE_KEYS.ordenes);
+    state.productos = loadList(STORAGE_KEYS.productos);
   } catch (error) {
     state.loadError = error.message;
     globalError.textContent =
@@ -81,12 +100,28 @@ function initState() {
 function setFormDisabled(disabled) {
   const fields = document.querySelectorAll("input, select, button");
   fields.forEach((field) => {
-    if (field.id === "mesa-reset" || field.id === "mesero-reset") {
+    if (
+      field.id === "mesa-reset" ||
+      field.id === "mesero-reset" ||
+      field.id === "producto-reset" ||
+      field.classList.contains("tab-button")
+    ) {
       field.disabled = false;
       return;
     }
     field.disabled = disabled;
   });
+}
+
+function ensureMesaDefaults(mesa) {
+  const normalized = { ...mesa };
+  if (!normalized.estado) {
+    normalized.estado = "LIBRE";
+  }
+  if (typeof normalized.habilitada !== "boolean") {
+    normalized.habilitada = normalized.estado !== "DESHABILITADA";
+  }
+  return normalized;
 }
 
 function normalizeText(value) {
@@ -109,6 +144,24 @@ function isDigits(value) {
   return /^\d+$/.test(value);
 }
 
+function isValidPrice(value) {
+  return /^\d+(\.\d{1,2})?$/.test(value);
+}
+
+function formatPrice(value) {
+  return Number(value).toFixed(2);
+}
+
+function parseBoolean(value) {
+  if (value === "true") {
+    return true;
+  }
+  if (value === "false") {
+    return false;
+  }
+  return null;
+}
+
 function getActiveOrdersByMesaId(mesaId) {
   return state.ordenes.filter(
     (orden) =>
@@ -119,6 +172,36 @@ function getActiveOrdersByMesaId(mesaId) {
 
 function getOrdersByMeseroId(meseroId) {
   return state.ordenes.filter((orden) => orden.meseroId === meseroId);
+}
+
+function getOrderProductIds(orden) {
+  const collections = [];
+  if (Array.isArray(orden.items)) {
+    collections.push(orden.items);
+  }
+  if (Array.isArray(orden.productos)) {
+    collections.push(orden.productos);
+  }
+  if (Array.isArray(orden.detalle)) {
+    collections.push(orden.detalle);
+  }
+  return collections
+    .flat()
+    .map((item) => {
+      if (item.productoId) return String(item.productoId);
+      if (item.productId) return String(item.productId);
+      if (item.idProducto) return String(item.idProducto);
+      if (item.id) return String(item.id);
+      if (item.producto && item.producto.id) return String(item.producto.id);
+      return null;
+    })
+    .filter(Boolean);
+}
+
+function hasProductOrders(productId) {
+  return state.ordenes.some((orden) =>
+    getOrderProductIds(orden).includes(productId)
+  );
 }
 
 function renderErrors(container, errors) {
@@ -139,6 +222,7 @@ function renderErrors(container, errors) {
 function clearErrors() {
   mesaErrors.innerHTML = "";
   meseroErrors.innerHTML = "";
+  productoErrors.innerHTML = "";
   globalError.textContent = state.loadError ? globalError.textContent : "";
 }
 
@@ -177,8 +261,8 @@ function validateMesa(input) {
     errors.push("La capacidad debe estar entre 1 y 99.");
   }
 
-  if (!["LIBRE", "OCUPADA"].includes(input.estado)) {
-    errors.push("El estado debe ser LIBRE u OCUPADA.");
+  if (!["LIBRE", "OCUPADA", "DESHABILITADA"].includes(input.estado)) {
+    errors.push("El estado debe ser LIBRE, OCUPADA o DESHABILITADA.");
   }
 
   const activeOrders = getActiveOrdersByMesaId(input.id);
@@ -189,6 +273,14 @@ function validateMesa(input) {
     (!existingMesa || existingMesa.estado !== "OCUPADA")
   ) {
     errors.push("La mesa ya tiene una orden activa y no puede marcarse OCUPADA.");
+  }
+
+  if (
+    input.estado === "DESHABILITADA" &&
+    activeOrders.length > 0 &&
+    (!existingMesa || existingMesa.estado !== "DESHABILITADA")
+  ) {
+    errors.push("La mesa tiene una orden activa y no puede deshabilitarse.");
   }
 
   if (errors.length) {
@@ -213,7 +305,7 @@ function validateMesero(input) {
   if (!input.nombre) {
     errors.push("El nombre es obligatorio.");
   } else if (!isAlphanumericText(input.nombre)) {
-    errors.push("El nombre solo permite caracteres alfanumericos.");
+    errors.push("El nombre solo permite caracteres alfanumericos y espacios.");
   }
 
   if (!input.dni) {
@@ -246,22 +338,81 @@ function validateMesero(input) {
   }
 }
 
+function validateProducto(input) {
+  const errors = [];
+  if (!input.id) {
+    errors.push("El ID es obligatorio.");
+  } else if (!isId(input.id)) {
+    errors.push("El ID solo permite letras, numeros, guion y guion bajo.");
+  } else if (
+    state.productos.some(
+      (producto) =>
+        producto.id === input.id && producto.id !== state.editingProductoId
+    )
+  ) {
+    errors.push("El ID del producto ya existe.");
+  }
+
+  if (!input.nombre) {
+    errors.push("El nombre es obligatorio.");
+  } else if (!isAlphanumericText(input.nombre)) {
+    errors.push("El nombre solo permite caracteres alfanumericos y espacios.");
+  }
+
+  if (!input.precio) {
+    errors.push("El precio es obligatorio.");
+  } else if (!isValidPrice(input.precio)) {
+    errors.push("El precio debe tener hasta 2 decimales.");
+  } else if (Number(input.precio) <= 0) {
+    errors.push("El precio debe ser mayor a 0.");
+  }
+
+  if (!input.descripcion) {
+    errors.push("La descripcion es obligatoria.");
+  }
+
+  if (typeof input.disponibilidad !== "boolean") {
+    errors.push("La disponibilidad es invalida.");
+  }
+
+  if (typeof input.estado !== "boolean") {
+    errors.push("El estado es invalido.");
+  }
+
+  if (errors.length) {
+    throw new ValidationError(errors);
+  }
+}
+
 function readMesaForm() {
+  const estado = mesaEstadoInput.value;
   return {
-    id: state.editingMesaId || generateMesaId(),
+    id: normalizeId(mesaIdInput.value),
     numero: Number(mesaNumeroInput.value),
     capacidad: Number(mesaCapacidadInput.value),
-    estado: mesaEstadoInput.value,
+    estado,
+    habilitada: estado !== "DESHABILITADA",
   };
 }
 
 function readMeseroForm() {
   return {
-    id: state.editingMeseroId || generateMeseroId(),
+    id: normalizeId(meseroIdInput.value),
     nombre: normalizeText(meseroNombreInput.value),
     dni: meseroDniInput.value.trim(),
     telefono: meseroTelefonoInput.value.trim(),
     estado: meseroEstadoInput.value,
+  };
+}
+
+function readProductoForm() {
+  return {
+    id: normalizeId(productoIdInput.value),
+    nombre: normalizeText(productoNombreInput.value),
+    precio: productoPrecioInput.value.trim(),
+    disponibilidad: parseBoolean(productoDisponibilidadInput.value),
+    estado: parseBoolean(productoEstadoInput.value),
+    descripcion: normalizeText(productoDescripcionInput.value),
   };
 }
 
@@ -281,12 +432,24 @@ function resetMeseroForm() {
   meseroErrors.innerHTML = "";
 }
 
+function resetProductoForm() {
+  productoForm.reset();
+  state.editingProductoId = null;
+  productoIdInput.disabled = false;
+  productoSubmitText("Guardar");
+  productoErrors.innerHTML = "";
+}
+
 function mesaSubmitText(text) {
   document.getElementById("mesa-submit").textContent = text;
 }
 
 function meseroSubmitText(text) {
   document.getElementById("mesero-submit").textContent = text;
+}
+
+function productoSubmitText(text) {
+  document.getElementById("producto-submit").textContent = text;
 }
 
 function renderMesas() {
@@ -329,6 +492,35 @@ function renderMeseros() {
     );
     row.appendChild(actions);
     meseroBody.appendChild(row);
+  });
+}
+
+function renderProductos() {
+  productoBody.innerHTML = "";
+  const productos = [...state.productos].sort((a, b) =>
+    a.nombre.localeCompare(b.nombre)
+  );
+  productoEmpty.style.display = productos.length ? "none" : "block";
+  productos.forEach((producto) => {
+    const row = document.createElement("tr");
+    row.appendChild(createCell(producto.id));
+    row.appendChild(createCell(producto.nombre));
+    row.appendChild(createCell(formatPrice(producto.precio)));
+    row.appendChild(
+      createCell(producto.disponibilidad ? "DISPONIBLE" : "NO DISPONIBLE")
+    );
+    row.appendChild(createCell(producto.estado ? "ACTIVO" : "INACTIVO"));
+    row.appendChild(createCell(producto.descripcion));
+
+    const actions = document.createElement("td");
+    actions.appendChild(
+      createActionButton("Editar", "edit-producto", producto.id)
+    );
+    actions.appendChild(
+      createActionButton("Eliminar", "delete-producto", producto.id, "danger")
+    );
+    row.appendChild(actions);
+    productoBody.appendChild(row);
   });
 }
 
@@ -394,6 +586,35 @@ function handleMeseroSubmit(event) {
   } catch (error) {
     if (error instanceof ValidationError) {
       renderErrors(meseroErrors, error.errors);
+      return;
+    }
+    globalError.textContent = error.message;
+  }
+}
+
+function handleProductoSubmit(event) {
+  event.preventDefault();
+  clearErrors();
+  try {
+    const input = readProductoForm();
+    validateProducto(input);
+    const producto = {
+      ...input,
+      precio: formatPrice(input.precio),
+    };
+    if (state.editingProductoId) {
+      state.productos = state.productos.map((item) =>
+        item.id === state.editingProductoId ? producto : item
+      );
+    } else {
+      state.productos.push(producto);
+    }
+    saveList(STORAGE_KEYS.productos, state.productos);
+    resetProductoForm();
+    renderProductos();
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      renderErrors(productoErrors, error.errors);
       return;
     }
     globalError.textContent = error.message;
@@ -480,6 +701,53 @@ function handleMeseroActions(event) {
   }
 }
 
+function handleProductoActions(event) {
+  const action = event.target.dataset.action;
+  const id = event.target.dataset.id;
+  if (!action || !id) {
+    return;
+  }
+
+  if (action === "edit-producto") {
+    const producto = state.productos.find((item) => item.id === id);
+    if (!producto) {
+      return;
+    }
+    productoIdInput.value = producto.id;
+    productoNombreInput.value = producto.nombre;
+    productoPrecioInput.value = producto.precio;
+    productoDisponibilidadInput.value = producto.disponibilidad ? "true" : "false";
+    productoEstadoInput.value = producto.estado ? "true" : "false";
+    productoDescripcionInput.value = producto.descripcion;
+    state.editingProductoId = producto.id;
+    productoIdInput.disabled = true;
+    productoSubmitText("Actualizar");
+    return;
+  }
+
+  if (action === "delete-producto") {
+    if (hasProductOrders(id)) {
+      state.productos = state.productos.map((producto) =>
+        producto.id === id
+          ? { ...producto, estado: false, disponibilidad: false }
+          : producto
+      );
+      saveList(STORAGE_KEYS.productos, state.productos);
+      renderProductos();
+      renderErrors(productoErrors, [
+        "El producto tiene ordenes historicas y fue marcado como INACTIVO.",
+      ]);
+      return;
+    }
+    if (!confirm("Deseas eliminar este producto?")) {
+      return;
+    }
+    state.productos = state.productos.filter((producto) => producto.id !== id);
+    saveList(STORAGE_KEYS.productos, state.productos);
+    renderProductos();
+  }
+}
+
 function handleMesaReset() {
   if (!confirm("Deseas limpiar los datos de mesas?")) {
     return;
@@ -500,6 +768,33 @@ function handleMeseroReset() {
   renderMeseros();
 }
 
+function handleProductoReset() {
+  if (!confirm("Deseas limpiar los datos del catalogo?")) {
+    return;
+  }
+  state.productos = [];
+  saveList(STORAGE_KEYS.productos, state.productos);
+  resetProductoForm();
+  renderProductos();
+}
+
+function initTabs() {
+  const buttons = document.querySelectorAll(".tab-button");
+  const panels = document.querySelectorAll(".tab-panel");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const tab = button.dataset.tab;
+      buttons.forEach((item) => item.classList.remove("active"));
+      panels.forEach((panel) => panel.classList.remove("active"));
+      button.classList.add("active");
+      const activePanel = document.querySelector(`.tab-panel[data-tab="${tab}"]`);
+      if (activePanel) {
+        activePanel.classList.add("active");
+      }
+    });
+  });
+}
+
 function bindEvents() {
   mesaForm.addEventListener("submit", handleMesaSubmit);
   mesaCancelButton.addEventListener("click", resetMesaForm);
@@ -510,11 +805,19 @@ function bindEvents() {
   meseroCancelButton.addEventListener("click", resetMeseroForm);
   meseroBody.addEventListener("click", handleMeseroActions);
   meseroResetButton.addEventListener("click", handleMeseroReset);
+
+  productoForm.addEventListener("submit", handleProductoSubmit);
+  productoCancelButton.addEventListener("click", resetProductoForm);
+  productoBody.addEventListener("click", handleProductoActions);
+  productoResetButton.addEventListener("click", handleProductoReset);
+
+  initTabs();
 }
 
 function renderAll() {
   renderMesas();
   renderMeseros();
+  renderProductos();
 }
 
 initState();
@@ -522,14 +825,4 @@ bindEvents();
 renderAll();
 if (state.loadError) {
   setFormDisabled(true);
-}
-
-function generateMesaId() {
-  const maxId = state.mesas.length ? Math.max(...state.mesas.map(m => parseInt(m.id))) : 0;
-  return String(maxId + 1);
-}
-
-function generateMeseroId() {
-  const maxId = state.meseros.length ? Math.max(...state.meseros.map(m => parseInt(m.id))) : 0;
-  return String(maxId + 1);
 }

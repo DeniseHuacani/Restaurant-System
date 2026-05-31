@@ -33,6 +33,30 @@ body {
   gap: 24px;
 }
 
+.tab-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.tab-button.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
 .card {
   background: #ffffff;
   padding: 20px 24px;
@@ -69,6 +93,18 @@ select {
   border: 1px solid #d0d7de;
   border-radius: 6px;
   font-size: 14px;
+}
+
+textarea {
+  padding: 8px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.full-width {
+  grid-column: 1 / -1;
 }
 
 input:disabled,
