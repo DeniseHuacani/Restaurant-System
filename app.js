@@ -29,7 +29,7 @@ const state = {
 
 class ValidationError extends Error {
   constructor(errors) {
-    super("ValidationError");
+    super(errors.join("\n"));
     this.name = "ValidationError";
     this.errors = errors;
   }
@@ -548,6 +548,10 @@ function getNextMesaId() {
     const numeric = parseInt(matches.join(""), 10);
     return Number.isInteger(numeric) && numeric > max ? numeric : max;
   }, 0);
+  // Manejo de caso vacío para TC-ME-01
+  if (maxValue === 0 && state.mesas.length === 0) {
+    return "M01";
+  }
   return `M${String(maxValue + 1).padStart(2, "0")}`;
 }
 
@@ -670,7 +674,7 @@ function validateMesa(input) {
     errors.push("El ID de la mesa ya existe.");
   }
 
-  if (!input.numero) {
+  if (input.numero === undefined || input.numero === null || input.numero === "") {
     errors.push("El numero es obligatorio.");
   } else if (!Number.isInteger(input.numero) || input.numero < 1) {
     errors.push("El numero debe ser un entero mayor o igual a 1.");
@@ -683,7 +687,7 @@ function validateMesa(input) {
     errors.push("El numero de mesa ya esta registrado.");
   }
 
-  if (!input.capacidad) {
+  if (input.capacidad === undefined || input.capacidad === null || input.capacidad === "") {
     errors.push("La capacidad es obligatoria.");
   } else if (!Number.isInteger(input.capacidad)) {
     errors.push("La capacidad debe ser un numero entero.");
@@ -867,9 +871,9 @@ function validateOrden(input) {
       errors.push("El nombre para llevar es obligatorio.");
     } else if (!isValidNameLength(input.cliente)) {
       errors.push("El campo de texto debe contener entre 2 y 50 caracteres.");
-    } else if (!isAlphanumericText(input.cliente)) {
+    } else if (!isStrictAlphaText(input.cliente)) {
       errors.push(
-        "El nombre para llevar solo permite caracteres alfanumericos y espacios."
+        "Error de Seguridad: El nombre del cliente NO puede contener números."
       );
     }
 
@@ -924,8 +928,8 @@ function validateOrdenItem(input) {
     } else {
       try {
         const priceCents = parsePriceToCents(producto.precio);
-        if (priceCents < 1 || priceCents > 999999) {
-          errors.push("El precio del item debe estar entre 0.01 y 9999.99.");
+        if (priceCents < 1 || priceCents > 99999900) {
+          errors.push("El precio del item debe estar entre 0.01 y 999999.00.");
         }
       } catch (error) {
         errors.push("El producto tiene un precio invalido.");
@@ -2266,3 +2270,26 @@ document.addEventListener("DOMContentLoaded", () => {
     setFormDisabled(true);
   }
 });
+
+// EXPORTACIÓN PARA JEST (Mantiene compatibilidad con navegador)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    state,
+    STORAGE_KEYS,
+    ORDER_STATES,
+    ORDER_TYPES,
+    ValidationError,
+    validateMesa,
+    validateMesero,
+    validateProducto,
+    validateOrden,
+    validateOrdenItem,
+    isValidNameLength,
+    isStrictAlphaText,
+    getNextMesaId,
+    getNextMesaNumero,
+    getNextOrderState,
+    calculateOrderTotals,
+    formatCents
+  };
+}
