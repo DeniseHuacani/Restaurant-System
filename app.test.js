@@ -45,6 +45,14 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       const mesaLetras = { id: "M01", numero: 1, capacidad: "Diez", estado: "LIBRE" };
       expect(() => app.validateMesa(mesaLetras)).toThrow(/numero entero/);
     });
+
+    // TC-ME-07
+    test('TC-ME-07: Bloqueo de edición/eliminación en mesa OCUPADA o con órdenes activas', () => {
+      app.state.mesas = [{ id: "M01", numero: 1, capacidad: 4, estado: "OCUPADA", habilitada: true, activo: true }];
+      app.state.ordenes = [{ id: "O1", mesaId: "M01", estado: "PENDIENTE" }];
+      
+      expect(() => app.checkMesaActionLocks("M01")).toThrow("No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.");
+    });
   });
 
   describe('Módulo: Meseros', () => {
@@ -108,6 +116,21 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       expect(() => app.validateProducto(pScript)).toThrow(/NO permite números ni símbolos/);
     });
 
+    // TC-CA-07
+    test('TC-CA-07: Descripción de producto: Longitud válida en fronteras (2 y 500)', () => {
+      const pMin = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "Ab", disponibilidad: true, estado: true };
+      const pMax = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A".repeat(500), disponibilidad: true, estado: true };
+      expect(() => app.validateProducto(pMin)).not.toThrow();
+      expect(() => app.validateProducto(pMax)).not.toThrow();
+    });
+
+    test('TC-CA-08: Descripción de producto: Longitud inválida (1 y 501)', () => {
+      const pBajo = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A", disponibilidad: true, estado: true };
+      const pSobre = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A".repeat(501), disponibilidad: true, estado: true };
+      expect(() => app.validateProducto(pBajo)).toThrow(/entre 2 y 500 caracteres/);
+      expect(() => app.validateProducto(pSobre)).toThrow(/entre 2 y 500 caracteres/);
+    });
+
     // TC-CA-06
     test('TC-CA-06: Borrado Lógico de producto', () => {
       const producto = { id: "P01", nombre: "Ceviche", activo: true };
@@ -165,7 +188,7 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       const itemBad = { ordenId: "O-001", productoId: "P01", cantidad: 0 };
       
       expect(() => app.validateOrdenItem(itemOk)).not.toThrow();
-      expect(() => app.validateOrdenItem(itemBad)).toThrow("La cantidad debe ser al menos 1.");
+      expect(() => app.validateOrdenItem(itemBad)).toThrow("La cantidad debe estar entre 1 y 99.");
     });
 
     // TC-IT-03

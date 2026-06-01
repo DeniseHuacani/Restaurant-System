@@ -89,40 +89,40 @@ Para considerar el MVP aprobado, se deben cumplir las siguientes pruebas:
 
 ## BDD: Escenarios de Validación posibles
 
-### 1. Escenario: Integridad de Catálogo (ProductGate)
-* **Given:** Un producto "Hamburguesa" con ID 10 tiene una orden asociada.
-* **When:** El usuario intenta ejecutar `deleteProduct(10)`.
-* **Then:** El `ProductGate` debe lanzar un `DataIntegrityError`.
-* **And:** El producto debe mantenerse en estado `INACTIVO` en lugar de ser eliminado.
+### 1. Escenario: Integridad de Catálogo (Borrado Lógico)
+* **Dado que** un producto "Cuy Chactado" tiene órdenes históricas vinculadas.
+* **Cuando** el usuario intenta eliminar el producto desde el catálogo.
+* **Entonces** el sistema realiza un borrado lógico (activo: false).
+* **Y** el producto deja de estar disponible para nuevas órdenes sin romper el historial.
 
-### 2. Escenario: Cálculo de Órdenes "Para Llevar" (FinanceGate)
-* **Given:** Una orden `TAKEOUT` con subtotal de 10.00.
-* **When:** `FinanceGate` calcula el total con `PACKAGING_FEE` (0.40).
-* **Then:** El resultado debe ser `10.40` exactos.
-* **And:** La validación debe garantizar que no existen residuos de punto flotante.
+### 2. Escenario: Cálculo de Órdenes "Para Llevar" (Recargo de Empaque)
+* **Dado que** se crea una orden de tipo "PARA LLEVAR" con un subtotal de S/ 10.00.
+* **Cuando** el sistema procesa la orden.
+* **Entonces** se aplica automáticamente el recargo de S/ 0.40 por packaging.
+* **Y** el total final es de S/ 10.40 calculados mediante aritmética de céntimos para precisión absoluta.
 
-### 3. Escenario: Transición de Estado (StateGate)
-* **Given:** La orden `O-001` está en `PENDING`.
-* **When:** Se intenta pasar directamente a `READY`.
-* **Then:** El `StateGate` bloquea la transición por violación de secuencia FSM.
+### 3. Escenario: Transición de Estado Secuencial
+* **Dado que** la orden `O-001` se encuentra en estado "PENDIENTE".
+* **Cuando** el usuario intenta avanzar el estado.
+* **Entonces** el sistema solo permite la transición a "EN COCINA", bloqueando saltos directos a "LISTO" o "PAGADO".
 
-### 4. Escenario: Cierre y Liberación (ClosingGate)
-* **Given:** La mesa `M-01` está `OCUPADA` por la orden `O-001`.
-* **When:** El usuario ejecuta `closeOrder(O-001)`.
-* **Then:** `ClosingGate` actualiza la orden a `CLOSED` y cambia `M-01` a `LIBRE` en una sola transacción atómica.
+### 4. Escenario: Cobro y Liberación Atómica de Mesa
+* **Dado que** la mesa "M01" está "OCUPADA" por la orden "O-001" en estado "LISTO".
+* **Cuando** el cajero confirma el pago mediante el Modal de Cobro.
+* **Entonces** la orden cambia a "PAGADO", se registra en el historial y la mesa "M01" se libera automáticamente a "LIBRE".
 
 # Validaciones
 ## 5) Estrategia de validaciones (exhaustiva)
-**Tipos de validación:**
-- **Estructural:** tipo correcto (int, str), longitud mínima/máxima, formato (teléfono), rangos (cantidad > 0).
-- **Referencial:** mesa/mesero/orden existen antes de asignar.
-- **Estado:** transiciones válidas según tipo de orden.
-- **Restrictiva:** una mesa no tiene más de una orden activa; delivery requiere dirección y teléfono.
-- **Negocio:** límites de cantidad, ítems por orden, montos máximos.
+El sistema implementa una **estrategia de blindaje de triple capa** para garantizar la integridad de la operación:
+
+1.  **Capa UI (Prevención Activa):** Deshabilitación física de controles. Los botones de edición/eliminación se bloquean en mesas con órdenes activas ("OCUPADA") y el estado inicial de las órdenes nace bloqueado en "PENDIENTE" para evitar manipulaciones de flujo.
+2.  **Capa de Negocio (Inyección de Errores):** Bloqueo de envíos erróneos mediante validación en tiempo real. Los mensajes de error de la matriz de pruebas se inyectan dinámicamente en texto rojo exactamente DEBAJO de cada input afectado, eliminando alertas nativas y asegurando feedback contextual.
+3.  **Capa de Calidad (Validación Unitaria):** Cobertura de pruebas automatizadas con **Jest**. Cada regla de validación, límite de frontera (AVL) y partición de equivalencia en `app.js` tiene un espejo exacto en `app.test.js` que valida los mensajes y comportamientos esperados.
 
 **Ejemplos de restricciones clave:**
 - `Mesa`: solo puede estar `libre/ocupada`; no se asigna si tiene orden activa.
 - `Orden mesa`: requiere mesa asignada; no permite delivery fields.
 - `Orden delivery`: requiere `cliente`, `dirección`, `teléfono`.
 - `Orden llevar`: no mesa, no delivery.
-- `Item`: cantidad 1..99, precio 0.01..9999.99, nombre 1..60 chars.
+- `Item`: cantidad 1..99, precio 0.01..9999.99, nombre 1..60 chars, descripción 2..500 chars.
+- `Textos`: nombres y descripciones breves (2 a 50 caracteres).

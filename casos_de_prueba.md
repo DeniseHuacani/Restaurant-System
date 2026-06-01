@@ -20,6 +20,7 @@
 | **Catálogo** | TC-CA-02 | Precio de producto: Valor inválido (nulo). | Frontera Inferior - 0.01 | Precio = 0.00 | Análisis Valores Límite | Error: "El precio debe ser mayor a 0 y menor que 999999." |
 | **Catálogo** | TC-CA-03 | Precio de producto: Valor máximo válido. | Límite Superior (999999) | Precio = 999999.00 | Análisis Valores Límite | Registro exitoso con precio máximo permitido. |
 | **Catálogo** | TC-CA-04 | Precio de producto: Valor inválido (exceso). | Frontera Superior + 0.01 | Precio = 999999.01 | Análisis Valores Límite | Error: "El precio debe ser mayor a 0 y menor que 999999." |
+| **Catálogo** | TC-CA-07 | Descripción de producto: Longitud válida e inválida. | Fronteras (2, 500) | Desc: 2 y 500 chars / 1 y 501 chars | AVL | Registro exitoso en fronteras; Error: "La descripción debe contener entre 2 y 500 caracteres." en inválidos. |
 | **Catálogo** | TC-CA-05 | Cruce de Tipos: Símbolos en Descripción. | Clase Inválida | Desc = '<>'Sopa  | Partición Equivalencia | Error de Seguridad: "La descripción NO permite números ni símbolos..." |
 | **Textos** | TC-TX-01 | Longitud de nombre: Valor mínimo válido. | Límite Inferior (2) | Nombre = "Ab" | Análisis Valores Límite | Registro exitoso del nombre. |
 | **Textos** | TC-TX-02 | Longitud de nombre: Valor insuficiente. | Frontera Inferior - 1 | Nombre = "A" | Análisis Valores Límite | Error: "El campo de texto debe contener entre 2 y 50 caracteres." |
@@ -30,7 +31,7 @@
 | **Órdenes** | TC-OR-03 | Creación de orden "Mesa": Selección de Mesa y Mesero. | Clase Válida | Mesa="M1", Mesero="W1" | Partición Equivalencia | Orden creada; mesa M1 cambia estado a "OCUPADA" visualmente. |
 | **Órdenes** | TC-OR-04 | Cruce de Tipos: Números en Nombre Cliente. | Clase Inválida | Cliente = "Pedro 01" | Partición Equivalencia | Error de Seguridad: "El nombre del cliente NO puede contener números." |
 | **Modal Items**| TC-IT-01 | Cantidad de platillos: Mínimo permitido. | Límite Inferior (1) | Cantidad = 1 | Análisis Valores Límite | Ítem añadido a la orden con éxito. |
-| **Modal Items**| TC-IT-02 | Cantidad de platillos: Valor inválido. | Frontera Inferior - 1 | Cantidad = 0 | Análisis Valores Límite | Error: "La cantidad debe ser al menos 1." |
+| **Modal Items**| TC-IT-02 | Cantidad de platillos: Valor inválido. | Frontera Inferior - 1 (0) o Frontera Superior + 1 (100) | Cantidad = 0 o 100 | Análisis Valores Límite | Error: "La cantidad debe estar entre 1 y 99." |
 | **Modal Items**| TC-IT-03 | Modificación de pedido: Edición de fila existente. | Clase Válida | Cantidad cambia 1 -> 3 | Transición de Estados | El total de la orden se actualiza automáticamente en el modal y dashboard. |
 | **Modal Items**| TC-IT-04 | Cruce de Tipos: Letras en Cantidad. | Clase Inválida | Cantidad = "Tres" | Partición Equivalencia | El campo numérico bloquea la entrada de texto; validación lógica rechaza el valor. |
 | **Cobro** | TC-CO-01 | Cobro en efectivo: Monto recibido exacto. | Límite Exacto | Total=50, Recibido=50 | Análisis Valores Límite | Vuelto muestra "S/ 0.00". Estado cambia a "PAGADO" y desaparece de Activas. |

@@ -19,12 +19,18 @@ En el Dashboard se observan:
 ### Agregar items a una orden
 1. En **Items de Orden**, selecciona una orden abierta.
 2. Selecciona un producto disponible y activo.
-3. Ingresa cantidad (1 a 99) y presiona **Agregar item**.
+3. Ingresa la cantidad deseada (rango permitido: **1 a 99**).
+4. Si los datos son inválidos (cantidad 0 o ingreso de letras - TC-IT-04), aparecerá una **alerta en texto rojo debajo del input**.
+5. Presiona **Confirmar Pedido** para actualizar la comanda.
 
 ### Avanzar estado o cerrar orden
 1. En la tabla de ordenes, usa el boton de **Acciones**.
-2. El estado avanza secuencialmente: `PENDING` -> `PREPARING` -> `READY` -> `CLOSED`.
-3. Al cerrar, la mesa se libera automaticamente.
+2. El estado avanza de forma estrictamente secuencial: **"PENDIENTE"** -> **"EN COCINA"** -> **"LISTO"** -> **"PAGADO"**.
+3. Para finalizar una orden y pasarla a **"PAGADO"**, el sistema abrirá automáticamente el **Modal de Cobro** (TC-FL-02).
+    - El modal hereda los ítems y el total exacto.
+    - Exige ingresar el "Monto Recibido", el cual debe ser igual o mayor al total (TC-CO-01/02/03).
+    - El sistema bloquea el ingreso de letras en el monto (TC-CO-04) mediante alertas rojas.
+4. Al procesar el pago, la orden se mueve al **Historial de Ventas**, se elimina de la vista de órdenes activas y la mesa vinculada regresa automáticamente al estado **"LIBRE"**.
 
 ## 3. Gestion de Catalogo
 1. Ve a la pestaña **Catalogo**.

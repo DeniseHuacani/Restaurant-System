@@ -853,8 +853,8 @@ function validateProducto(input) {
 
   if (!input.descripcion) {
     errors.push("La descripción es obligatoria.");
-  } else if (!isValidNameLength(input.descripcion)) {
-    errors.push("La descripción debe contener entre 2 y 50 caracteres.");
+  } else if (input.descripcion.length < 2 || input.descripcion.length > 500) {
+    errors.push("La descripción debe contener entre 2 y 500 caracteres.");
   } else if (!isStrictAlphaText(input.descripcion)) {
     errors.push("Error de Seguridad: La descripción NO permite números ni símbolos...");
   }
@@ -951,7 +951,7 @@ function validateOrdenItem(input) {
   if (!Number.isInteger(input.cantidad)) {
     errors.push("La cantidad debe ser un numero entero.");
   } else if (input.cantidad < 1 || input.cantidad > 99) {
-    errors.push("La cantidad debe ser al menos 1.");
+    errors.push("La cantidad debe estar entre 1 y 99.");
   }
 
   const orden = state.ordenes.find((item) => item.id === input.ordenId);
@@ -1210,8 +1210,23 @@ function renderMesas() {
     row.appendChild(createCell(mesa.estado));
 
     const actions = document.createElement("td");
-    actions.appendChild(createActionButton("Editar", "edit-mesa", mesa.id));
-    actions.appendChild(createActionButton("Eliminar", "delete-mesa", mesa.id, "danger"));
+    
+    // Bloqueo visual: Deshabilitar botones si la mesa está OCUPADA o tiene órdenes activas
+    const activeOrders = getActiveOrdersByMesaId(mesa.id);
+    const isLocked = mesa.estado === "OCUPADA" || activeOrders.length > 0;
+    
+    const editBtn = createActionButton("Editar", "edit-mesa", mesa.id);
+    const deleteBtn = createActionButton("Eliminar", "delete-mesa", mesa.id, "danger");
+    
+    if (isLocked) {
+      editBtn.disabled = true;
+      deleteBtn.disabled = true;
+      editBtn.classList.add("opacity-50", "cursor-not-allowed");
+      deleteBtn.classList.add("opacity-50", "cursor-not-allowed");
+    }
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
     row.appendChild(actions);
     mesaBody.appendChild(row);
   });
@@ -2010,8 +2025,8 @@ function handleOrdenItemSubmit(event) {
 
         const cantidad = parseInt(cantidadRaw, 10);
         // TC-IT-02
-        if (cantidad < 1) {
-          qtyErrSpan.textContent = "La cantidad debe ser al menos 1.";
+        if (cantidad < 1 || cantidad > 99) {
+          qtyErrSpan.textContent = "La cantidad debe estar entre 1 y 99.";
           qtyErrSpan.style.display = "block";
           hasRowErrors = true;
           return;
@@ -2153,11 +2168,33 @@ function handleOrdenActions(event) {
   }
 }
 
+/**
+ * Valida si una mesa puede ser editada o eliminada según su estado y órdenes activas
+ */
+function checkMesaActionLocks(id) {
+  const mesa = state.mesas.find(m => m.id === id);
+  if (!mesa) return;
+  const activeOrders = getActiveOrdersByMesaId(id);
+  if (mesa.estado === "OCUPADA" || activeOrders.length > 0) {
+    throw new Error("No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.");
+  }
+}
+
 function handleMesaActions(event) {
   const action = event.target.dataset.action;
   const id = event.target.dataset.id;
   if (!action || !id) {
     return;
+  }
+
+  // Blindaje de negocio: Bloqueo de acciones si hay órdenes activas o estado OCUPADA
+  if (action === "edit-mesa" || action === "delete-mesa") {
+    try {
+      checkMesaActionLocks(id);
+    } catch (error) {
+      renderErrors(mesaErrors, [error.message]);
+      return;
+    }
   }
 
   if (action === "edit-mesa") {
@@ -2177,11 +2214,11 @@ function handleMesaActions(event) {
   }
 
   if (action === "delete-mesa") {
-    const ordenes = getActiveOrdersByMesaId(id);
+    // Mantener la validación de integridad referencial histórica para eliminación
     const historico = state.ordenes.some((orden) => orden.mesaId === id);
-    if (ordenes.length || historico) {
+    if (historico) {
       renderErrors(mesaErrors, [
-        "No se puede eliminar la mesa porque tiene ordenes asociadas.",
+        "No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.",
       ]);
       return;
     }
@@ -2462,6 +2499,7 @@ if (typeof module !== 'undefined' && module.exports) {
     validateProducto,
     validateOrden,
     validateOrdenItem,
+    checkMesaActionLocks,
     isValidNameLength,
     isStrictAlphaText,
     isDigits,
