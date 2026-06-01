@@ -1,0 +1,24 @@
+{
+  "name": "restaurant-system",
+  "version": "1.0.0",
+  "description": "HTML + JavaScript + LocalStorage. No requiere build.",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FabbPP/Restaurant-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FabbPP/Restaurant-System/issues"
+  },
+  "homepage": "https://github.com/FabbPP/Restaurant-System#readme",
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
+  }
+}
