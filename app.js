@@ -1082,7 +1082,11 @@ function resetOrdenForm() {
   ordenForm.reset();
   ordenErrors.innerHTML = "";
   ordenIdInput.value = getNextOrderId();
+  ordenTipoInput.value = ORDER_TYPES.MESA; // Establecer tipo por defecto a MESA
   updateOrderTypeFields(ordenTipoInput.value);
+  // Asegurar que el estado de una nueva orden siempre sea PENDIENTE y no editable
+  ordenEstadoInput.value = "PENDIENTE";
+  ordenEstadoInput.innerHTML = '<option value="PENDIENTE">PENDIENTE</option>';
 }
 
 function resetOrdenItemForm() {
@@ -1168,12 +1172,6 @@ function getNextOrderId() {
     return max;
   }, 0);
   return `O-${String(maxValue + 1).padStart(3, "0")}`;
-}
-
-function fillEstadoSelect() {
-  if (ordenEstadoInput) {
-    ordenEstadoInput.innerHTML = ORDER_STATES.map(s => `<option value="${s}">${s}</option>`).join("");
-  }
 }
 
 function updateOrderTypeFields(tipo) {
@@ -2401,8 +2399,6 @@ function bindEvents() {
   ordenTipoInput.addEventListener("change", (event) => {
     updateOrderTypeFields(event.target.value);
   });
-
-  fillEstadoSelect();
 
   initTabs();
 }
