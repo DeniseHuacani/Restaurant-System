@@ -157,7 +157,7 @@ function seedMockData() {
       { id: "M1", numero: 1, capacidad: 4, estado: "LIBRE", habilitada: true },
       { id: "M2", numero: 2, capacidad: 2, estado: "LIBRE", habilitada: true },
       { id: "M3", numero: 3, capacidad: 6, estado: "LIBRE", habilitada: true },
-      { id: "M4", numero: 4, capacidad: 4, estado: "LIBRE", habilitada: false },
+      { id: "M4", numero: 4, capacidad: 4, estado: "LIBRE", habilitada: true },
     ];
     saveList(STORAGE_KEYS.mesas, mockMesas);
 
@@ -513,12 +513,63 @@ function getNextOrderState(currentState) {
   if (index < 0 || index >= ORDER_STATES.length - 1) {
     throw new Error("Estado de orden invalido.");
   }
+
   return ORDER_STATES[index + 1];
+}
+
+/**
+ * Genera el siguiente ID correlativo para Mesas (ej: M01, M02)
+ */
+function getNextMesaId() {
+  const maxValue = state.mesas.reduce((max, mesa) => {
+    const matches = String(mesa.id || "").match(/\d+/g);
+    if (!matches) return max;
+    const numeric = parseInt(matches.join(""), 10);
+    return Number.isInteger(numeric) && numeric > max ? numeric : max;
+  }, 0);
+  return `M${String(maxValue + 1).padStart(2, "0")}`;
+}
+
+/**
+ * Genera el siguiente número correlativo para Mesas
+ */
+function getNextMesaNumero() {
+  const maxValue = state.mesas.reduce((max, mesa) => {
+    return mesa.numero > max ? mesa.numero : max;
+  }, 0);
+  return maxValue + 1;
+}
+
+/**
+ * Genera el siguiente ID correlativo para Meseros (ej: W01, W02)
+ */
+function getNextMeseroId() {
+  const maxValue = state.meseros.reduce((max, mesero) => {
+    const matches = String(mesero.id || "").match(/\d+/g);
+    if (!matches) return max;
+    const numeric = parseInt(matches.join(""), 10);
+    return Number.isInteger(numeric) && numeric > max ? numeric : max;
+  }, 0);
+  return `W${String(maxValue + 1).padStart(2, "0")}`;
+}
+
+/**
+ * Genera el siguiente ID correlativo para Productos (ej: P01, P02)
+ */
+function getNextProductoId() {
+  const maxValue = state.productos.reduce((max, producto) => {
+    const matches = String(producto.id || "").match(/\d+/g);
+    if (!matches) return max;
+    const numeric = parseInt(matches.join(""), 10);
+    return Number.isInteger(numeric) && numeric > max ? numeric : max;
+  }, 0);
+  return `P${String(maxValue + 1).padStart(2, "0")}`;
 }
 
 function calculateOrderTotals(orden) {
   const itemsTotal = orden.items.reduce(
     (total, item) => total + item.precioCents * item.cantidad,
+
     0
   );
   const packagingFeeCents =
@@ -917,26 +968,37 @@ function readOrdenForm() {
 
 function resetMesaForm() {
   mesaForm.reset();
-  state.editingMesaId = null;
-  mesaIdInput.disabled = false;
-  mesaSubmitText("Guardar");
   mesaErrors.innerHTML = "";
+  state.editingMesaId = null;
+  // Calculamos e inyectamos valores inmediatamente
+  mesaIdInput.value = getNextMesaId();
+  mesaNumeroInput.value = getNextMesaNumero();
+  // Bloqueamos campos para edición manual
+  mesaIdInput.readOnly = true;
+  mesaNumeroInput.readOnly = true;
+  mesaSubmitText("Guardar");
 }
 
 function resetMeseroForm() {
   meseroForm.reset();
-  state.editingMeseroId = null;
-  meseroIdInput.disabled = false;
-  meseroSubmitText("Guardar");
   meseroErrors.innerHTML = "";
+  state.editingMeseroId = null;
+  // Calculamos e inyectamos ID inmediatamente
+  meseroIdInput.value = getNextMeseroId();
+  // Bloqueamos campo
+  meseroIdInput.readOnly = true;
+  meseroSubmitText("Guardar");
 }
 
 function resetProductoForm() {
   productoForm.reset();
-  state.editingProductoId = null;
-  productoIdInput.disabled = false;
-  productoSubmitText("Guardar");
   productoErrors.innerHTML = "";
+  state.editingProductoId = null;
+  // Calculamos e inyectamos ID inmediatamente
+  productoIdInput.value = getNextProductoId();
+  // Bloqueamos campo
+  productoIdInput.readOnly = true;
+  productoSubmitText("Guardar");
 }
 
 function resetOrdenForm() {
@@ -949,6 +1011,7 @@ function resetOrdenForm() {
 function resetOrdenItemForm() {
   ordenItemForm.reset();
   ordenItemErrors.innerHTML = "";
+  // Limpiar filas dinámicas y dejar solo una inicial
   ordenItemsContainer.innerHTML = "";
 }
 
@@ -1002,12 +1065,6 @@ function createItemRow(prefillProductId = "", prefillQty = 1) {
   ordenItemsContainer.appendChild(row);
 }
 
-function fillEstadoSelect() {
-  if (ordenEstadoInput) {
-    ordenEstadoInput.innerHTML = ORDER_STATES.map(s => `<option value="${s}">${s}</option>`).join("");
-  }
-}
-
 function mesaSubmitText(text) {
   document.getElementById("mesa-submit").textContent = text;
 }
@@ -1033,6 +1090,12 @@ function getNextOrderId() {
     return max;
   }, 0);
   return `O-${String(maxValue + 1).padStart(3, "0")}`;
+}
+
+function fillEstadoSelect() {
+  if (ordenEstadoInput) {
+    ordenEstadoInput.innerHTML = ORDER_STATES.map(s => `<option value="${s}">${s}</option>`).join("");
+  }
 }
 
 function updateOrderTypeFields(tipo) {
@@ -1457,7 +1520,15 @@ function handleMesaSubmit(event) {
   event.preventDefault();
   clearErrors();
   try {
-    const input = readMesaForm();
+    let input = readMesaForm();
+    if (!state.editingMesaId) { // Si es una nueva mesa, generamos ID y número
+      input.id = getNextMesaId();
+      input.numero = getNextMesaNumero();
+    } else { // Si estamos editando, usamos el ID y número existentes
+      const existingMesa = state.mesas.find(m => m.id === state.editingMesaId);
+      input.id = existingMesa.id;
+      input.numero = existingMesa.numero;
+    }
     validateMesa(input);
     if (state.editingMesaId) {
       state.mesas = state.mesas.map((mesa) =>
@@ -1482,7 +1553,12 @@ function handleMeseroSubmit(event) {
   event.preventDefault();
   clearErrors();
   try {
-    const input = readMeseroForm();
+    let input = readMeseroForm();
+    if (!state.editingMeseroId) { // Si es un nuevo mesero, generamos ID
+      input.id = getNextMeseroId();
+    } else { // Si estamos editando, usamos el ID existente
+      input.id = state.editingMeseroId;
+    }
     validateMesero(input);
     if (state.editingMeseroId) {
       state.meseros = state.meseros.map((mesero) =>
@@ -1507,7 +1583,12 @@ function handleProductoSubmit(event) {
   event.preventDefault();
   clearErrors();
   try {
-    const input = readProductoForm();
+    let input = readProductoForm();
+    if (!state.editingProductoId) { // Si es un nuevo producto, generamos ID
+      input.id = getNextProductoId();
+    } else { // Si estamos editando, usamos el ID existente
+      input.id = state.editingProductoId;
+    }
     validateProducto(input);
     const producto = {
       ...input,
@@ -1882,7 +1963,8 @@ function handleMesaActions(event) {
     mesaCapacidadInput.value = mesa.capacidad;
     mesaEstadoInput.value = mesa.estado;
     state.editingMesaId = mesa.id;
-    mesaIdInput.disabled = true;
+    mesaIdInput.readOnly = true;
+    mesaNumeroInput.readOnly = true;
     mesaSubmitText("Actualizar");
     return;
   }
@@ -1923,7 +2005,7 @@ function handleMeseroActions(event) {
     meseroTelefonoInput.value = mesero.telefono;
     meseroEstadoInput.value = mesero.estado;
     state.editingMeseroId = mesero.id;
-    meseroIdInput.disabled = true;
+    meseroIdInput.readOnly = true;
     meseroSubmitText("Actualizar");
     return;
   }
@@ -1964,7 +2046,7 @@ function handleProductoActions(event) {
     productoEstadoInput.value = producto.estado ? "true" : "false";
     productoDescripcionInput.value = producto.descripcion;
     state.editingProductoId = producto.id;
-    productoIdInput.disabled = true;
+    productoIdInput.readOnly = true;
     productoSubmitText("Actualizar");
     return;
   }
@@ -2023,6 +2105,9 @@ function handleMesaReset() {
   state.mesas = [];
   saveList(STORAGE_KEYS.mesas, state.mesas);
   resetMesaForm();
+  // Asegurarse de que los campos de ID/Número estén en solo lectura después del reset
+  mesaIdInput.readOnly = true;
+  mesaNumeroInput.readOnly = true;
   renderMesas();
 }
 
@@ -2033,6 +2118,8 @@ function handleMeseroReset() {
   state.meseros = [];
   saveList(STORAGE_KEYS.meseros, state.meseros);
   resetMeseroForm();
+  // Asegurarse de que el campo ID esté en solo lectura después del reset
+  meseroIdInput.readOnly = true;
   renderMeseros();
 }
 
@@ -2043,6 +2130,8 @@ function handleProductoReset() {
   state.productos = [];
   saveList(STORAGE_KEYS.productos, state.productos);
   resetProductoForm();
+  // Asegurarse de que el campo ID esté en solo lectura después del reset
+  productoIdInput.readOnly = true;
   renderProductos();
 }
 
@@ -2129,6 +2218,11 @@ function renderAll() {
     renderOrdenes();
     console.log("📊 [RENDER] Tabla de órdenes actualizada.");
   } catch (e) { console.error("❌ [ERROR] Fallo en renderOrdenes:", e); }
+
+  // Inicializar formularios para mostrar los IDs automáticos al inicio
+  resetMesaForm();
+  resetMeseroForm();
+  resetProductoForm();
 
   try {
     resetOrdenForm();

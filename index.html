@@ -496,12 +496,13 @@
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               ID
               <input
+                readonly
                 id="producto-id"
                 name="producto-id"
                 type="text"
                 autocomplete="off"
                 required
-                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                class="rounded-lg border border-outline-variant bg-surface-container-low cursor-not-allowed px-sm py-xs"
               />
             </label>
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
@@ -653,25 +654,26 @@
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               ID
               <input
+                readonly
                 id="mesa-id"
                 name="mesa-id"
                 type="text"
                 autocomplete="off"
                 pattern="[A-Za-z0-9_-]+"
                 required
-                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                class="rounded-lg border border-outline-variant bg-surface-container-low cursor-not-allowed px-sm py-xs"
               />
             </label>
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               Numero
-              <input
+              <input readonly
                 id="mesa-numero"
                 name="mesa-numero"
                 type="number"
                 min="1"
                 step="1"
                 required
-                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                class="rounded-lg border border-outline-variant bg-surface-container-low cursor-not-allowed px-sm py-xs"
               />
             </label>
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
@@ -785,13 +787,14 @@
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
               ID
               <input
+                readonly
                 id="mesero-id"
                 name="mesero-id"
                 type="text"
                 autocomplete="off"
                 pattern="[A-Za-z0-9_-]+"
                 required
-                class="rounded-lg border border-outline-variant bg-surface px-sm py-xs"
+                class="rounded-lg border border-outline-variant bg-surface-container-low cursor-not-allowed px-sm py-xs"
               />
             </label>
             <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
