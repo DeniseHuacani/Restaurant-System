@@ -519,10 +519,12 @@ function getOrdersByMeseroId(meseroId) {
   return state.ordenes.filter((orden) => orden.meseroId === meseroId);
 }
 
-function getOpenOrders() {
-  return state.ordenes.filter((orden) =>
-    ["PENDIENTE", "EN COCINA"].includes(String(orden.estado).toUpperCase())
-  );
+function getOrdenesActivas() {
+  return state.ordenes.filter((o) => o.estado !== "PAGADO");
+}
+
+function getHistorialVentas() {
+  return state.ordenes.filter((o) => o.estado === "PAGADO");
 }
 
 function canModifyOrderItems(orden) {
@@ -606,6 +608,27 @@ function calculateOrderTotals(orden) {
   };
 }
 
+/**
+ * Procesa la lógica de cobro (validación de montos)
+ */
+function procesarCobro(totalCents, recibido) {
+  const recibidoVal = parseFloat(recibido);
+  if (isNaN(recibidoVal)) {
+    throw new Error("Alerta de validación: El monto debe ser un número decimal válido.");
+  }
+  
+  const recibidoCents = Math.round(recibidoVal * 100);
+  if (recibidoCents < totalCents) {
+    throw new Error("⚠️ Dinero insuficiente. El monto recibido debe cubrir el total.");
+  }
+
+  return {
+    vuelto: (recibidoCents - totalCents) / 100,
+    recibidoCents,
+    estadoNuevo: "PAGADO"
+  };
+}
+
 function getOrderProductIds(orden) {
   const collections = [];
   if (Array.isArray(orden.items)) {
@@ -674,7 +697,7 @@ function validateMesa(input) {
     errors.push("El ID de la mesa ya existe.");
   }
 
-  if (input.numero === undefined || input.numero === null || input.numero === "") {
+   if (input.numero === undefined || input.numero === null || input.numero === "") {
     errors.push("El numero es obligatorio.");
   } else if (!Number.isInteger(input.numero) || input.numero < 1) {
     errors.push("El numero debe ser un entero mayor o igual a 1.");
@@ -806,7 +829,7 @@ function validateProducto(input) {
   if (!input.descripcion) {
     errors.push("La descripcion es obligatoria.");
   } else if (!isStrictAlphaText(input.descripcion)) {
-    errors.push("Error de Seguridad: La descripción NO permite números ni símbolos para evitar inyecciones.");
+    errors.push("Error de Seguridad: La descripción NO permite números ni símbolos...");
   }
 
   if (typeof input.disponibilidad !== "boolean") {
@@ -901,7 +924,7 @@ function validateOrdenItem(input) {
   if (!Number.isInteger(input.cantidad)) {
     errors.push("La cantidad debe ser un numero entero.");
   } else if (input.cantidad < 1 || input.cantidad > 99) {
-    errors.push("La cantidad debe estar entre 1 y 99.");
+    errors.push("La cantidad debe ser al menos 1.");
   }
 
   const orden = state.ordenes.find((item) => item.id === input.ordenId);
@@ -1261,8 +1284,8 @@ function renderOrdenSelects() {
 function renderOrdenes() {
   ordenBody.innerHTML = "";
   
-  // 1. FILTRADO: Solo mostramos órdenes operativas (que NO han sido PAGADAS)
-  const activeOrders = state.ordenes.filter((o) => o.estado !== "PAGADO");
+  // FILTRADO: Solo mostramos órdenes operativas
+  const activeOrders = getOrdenesActivas();
   
   ordenEmpty.style.display = activeOrders.length ? "none" : "block";
 
@@ -1314,9 +1337,12 @@ function renderOrdenes() {
     } else if (orden.estado !== "PAGADO") {
       // ESTADO B: Con productos asignados
       const nextState = getNextOrderState(orden.estado);
-      const label = nextState === "PAGADO" ? "💳 Cobrar" : `🍳 A Cocina`;
+      let label = "";
+      if (nextState === "EN COCINA") label = "🍳 A Cocina";
+      else if (nextState === "LISTO") label = "🔔 Servir";
+      else if (nextState === "PAGADO") label = "💳 Cobrar";
       
-      actions.appendChild(createActionButton(label, "advance-order", orden.id, "bg-primary text-on-primary border-none"));
+      actions.appendChild(createActionButton(label, "advance-order", orden.id, "bg-primary !text-on-primary hover:bg-surface-container-high hover:!text-primary border-none transition-colors"));
       actions.appendChild(createActionButton("✏️ Modificar", "open-items-modal", orden.id, "ml-xs"));
     }
 
@@ -1335,7 +1361,7 @@ function renderOrdenes() {
 function renderHistoryTable() {
   historyBody.innerHTML = "";
   // Filtramos solo las órdenes que ya fueron cobradas con éxito
-  const salesHistory = state.ordenes.filter((o) => o.estado === "PAGADO");
+  const salesHistory = getHistorialVentas();
   
   historyEmpty.classList.toggle("hidden", salesHistory.length > 0);
   
@@ -1540,6 +1566,10 @@ function createActionButton(label, action, id, className) {
 function handleMesaSubmit(event) {
   event.preventDefault();
   clearErrors();
+  
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true; // Parche: Evita doble registro por clic rápido
+
   try {
     let input = readMesaForm();
     if (!state.editingMesaId) { // Si es una nueva mesa, generamos ID y número
@@ -1567,12 +1597,18 @@ function handleMesaSubmit(event) {
       return;
     }
     globalError.textContent = error.message;
+  } finally {
+    if (submitBtn) submitBtn.disabled = false; // Restaurar tras procesar
   }
 }
 
 function handleMeseroSubmit(event) {
   event.preventDefault();
   clearErrors();
+
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true; // Parche: Prevención de duplicados
+
   try {
     let input = readMeseroForm();
     if (!state.editingMeseroId) { // Si es un nuevo mesero, generamos ID
@@ -1597,12 +1633,18 @@ function handleMeseroSubmit(event) {
       return;
     }
     globalError.textContent = error.message;
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
 function handleProductoSubmit(event) {
   event.preventDefault();
   clearErrors();
+
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
   try {
     let input = readProductoForm();
     if (!state.editingProductoId) { // Si es un nuevo producto, generamos ID
@@ -1631,12 +1673,18 @@ function handleProductoSubmit(event) {
       return;
     }
     globalError.textContent = error.message;
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
 function handleOrdenSubmit(event) {
   event.preventDefault();
   clearErrors();
+
+  const submitBtn = ordenForm.querySelector('#orden-submit');
+  if (submitBtn) submitBtn.disabled = true; // Parche: Seguridad en creación de comanda
+
   try {
     const input = readOrdenForm();
     validateOrden(input);
@@ -1787,18 +1835,37 @@ function updateBillingChange() {
 
 function handleBillingSubmit(event) {
   event.preventDefault();
+  const submitBtn = document.getElementById("billing-modal-confirm");
+  if (submitBtn) submitBtn.disabled = true; // Hacker-Proof: Bloquea cobro doble
+
   const received = parseFloat(billingReceivedAmount.value) || 0;
   const receivedCents = Math.round(received * 100);
 
   if (receivedCents < state.currentOrderTotalCents) {
     alert("⚠️ Dinero insuficiente. El monto recibido debe cubrir el total.");
+     if (submitBtn) submitBtn.disabled = false;
     return;
   }
   
-  const customerName = billingCustomerName.value.trim();
-  if (customerName && !isStrictAlphaText(customerName)) {
-    alert("⚠️ Bloqueo de Seguridad: El nombre del cliente solo debe contener letras.");
+  const dni = billingCustomerId.value.trim();
+  if (dni && (!isDigits(dni) || dni.length !== 8)) {
+    alert("⚠️ El DNI debe tener exactamente 8 dígitos numéricos.");
+    if (submitBtn) submitBtn.disabled = false;
     return;
+  }
+
+  const customerName = billingCustomerName.value.trim();
+  if (customerName) {
+    if (!isValidNameLength(customerName)) {
+      alert("El campo de texto debe contener entre 2 y 50 caracteres.");
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
+    if (!isStrictAlphaText(customerName)) {
+      alert("⚠️ Bloqueo de Seguridad: El nombre del cliente solo debe contener letras.");
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
   }
 
   const ordenId = state.currentOrderIdForBilling;
@@ -1824,11 +1891,15 @@ function handleBillingSubmit(event) {
   closeBillingModal();
   renderOrdenes();
   renderMesas();
+  // El botón se restaura al cerrar/abrir el modal
 }
 
 function handleOrdenItemSubmit(event) {
   event.preventDefault();
   clearErrors();
+  const submitBtn = document.getElementById("items-modal-save");
+  if (submitBtn) submitBtn.disabled = true;
+
   try {
     const ordenId = state.currentOrderIdForItems;
     if (!ordenId) throw new Error("Referencia de orden perdida.");
@@ -1862,15 +1933,17 @@ function handleOrdenItemSubmit(event) {
     // Sobrescribir items (Permite añadir y quitar en edición)
     orden.items = itemsToAdd;
 
-    saveList(STORAGE_KEYS.ordenes, state.ordenes);
+    saveList(STORAGE_KEYS.ordenes, state.ordenes); // Parche: Persistencia inmediata tras edición TC-IT-03
     closeItemsModal();
     renderOrdenes();
   } catch (error) {
     if (error instanceof ValidationError) {
       renderErrors(ordenItemErrors, error.errors);
-      return;
+    } else {
+      globalError.textContent = error.message;
     }
-    globalError.textContent = error.message;
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
@@ -1888,6 +1961,9 @@ function handleOrdenActions(event) {
 
   if (action === "advance-order") {
     clearErrors();
+    const actionBtn = event.target;
+    actionBtn.disabled = true; // Parche: Bloquea clics múltiples en acciones de tabla
+
     try {
       const orden = state.ordenes.find((item) => item.id === id);
       if (!orden) {
@@ -1900,6 +1976,7 @@ function handleOrdenActions(event) {
       const nextState = getNextOrderState(orden.estado);
       
       // Si el siguiente estado es PAGADO, abrimos el modal de cobro en lugar de avanzar directo
+      // Esto garantiza que no se salte el proceso de facturación
       if (nextState === "PAGADO") {
         openBillingModal(id);
         return;
@@ -1933,6 +2010,8 @@ function handleOrdenActions(event) {
         return;
       }
       globalError.textContent = error.message;
+    } finally {
+      actionBtn.disabled = false;
     }
   }
 
@@ -2286,10 +2365,16 @@ if (typeof module !== 'undefined' && module.exports) {
     validateOrdenItem,
     isValidNameLength,
     isStrictAlphaText,
+    isDigits,
     getNextMesaId,
     getNextMesaNumero,
     getNextOrderState,
     calculateOrderTotals,
-    formatCents
+    formatCents,
+    getOrdenesActivas,
+    getHistorialVentas,
+    procesarCobro,
+    getNextMeseroId,
+    getNextProductoId
   };
 }

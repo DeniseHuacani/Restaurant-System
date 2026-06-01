@@ -35,9 +35,13 @@
 | **Modal Items**| TC-IT-04 | Cruce de Tipos: Letras en Cantidad. | Clase Inválida | Cantidad = "Tres" | Partición Equivalencia | El campo numérico bloquea la entrada de texto; validación lógica rechaza el valor. |
 | **Cobro** | TC-CO-01 | Cobro en efectivo: Monto recibido exacto. | Límite Exacto | Total=50, Recibido=50 | Análisis Valores Límite | Vuelto muestra "S/ 0.00". Estado cambia a "PAGADO" y desaparece de Activas. |
 | **Cobro** | TC-CO-02 | Cobro en efectivo: Monto recibido con vuelto. | Clase Válida | Total=35, Recibido=50 | Partición Equivalencia | Vuelto autocalculado: "S/ 15.00". Registro en historial exitoso. |
-| **Cobro** | TC-CO-03 | Cobro en efectivo: Monto insuficiente. | Frontera - 0.01 | Total=10, Recibido=9.90 | Análisis Valores Límite | Alerta: "⚠️ Dinero insuficiente. El monto recibido debe cubrir el total." |
+| **Cobro** | TC-CO-03 | Cobro en efectivo: Monto insuficiente. | Frontera - 0.01 | Total=10, Recibido=9.90 | Análisis Valores Límite | Alerta: "Dinero insuficiente. El monto recibido debe cubrir el total." |
 | **Cobro** | TC-CO-04 | Cruce de Tipos: Letras en Monto Recibido. | Clase Inválida | Recibido = "Dinero" | Partición Equivalencia | Alerta de validación: El monto debe ser un número decimal válido. |
+| **Cobro** | TC-CO-05 | Validación de DNI en cobro: Longitud exacta. | Límite Exacto (8) | DNI = "12345678" | AVL | Pago procesado con éxito. |
+| **Cobro** | TC-CO-06 | Cruce de Tipos: Letras en DNI de pago. | Clase Inválida | DNI = "A1234567" | Partición | Alerta: "⚠️ El DNI debe tener exactamente 8 dígitos numéricos." |
+| **Cobro** | TC-CO-07 | Validación de Nombre en cobro: Longitud inválida. | Frontera -1 (1) | Nombre = "A" | AVL | Alerta: "El campo de texto debe contener entre 2 y 50 caracteres." |
+| **Cobro** | TC-CO-08 | Cruce de Tipos: Números en Nombre de pago. | Clase Inválida | Nombre = "Ana 123" | Partición | Alerta: "⚠️ Bloqueo de Seguridad: El nombre del cliente solo debe contener letras." |
 | **Flujo/Estados**| TC-FL-01 | Ciclo de vida: Transición "Pendiente" a "En Cocina". | Paso Secuencial | Clic en "A Cocina" | Transición de Estados | El estado cambia de "Pendiente" a "En Cocina" en la tabla. |
-| **Flujo/Estados**| TC-FL-02 | Ciclo de vida: Transición "Listo" a "Cobrar". | Paso Secuencial | Clic en "💳 Cobrar" | Transición de Estados | Abre el Modal de Cobro y hereda los datos de ítems y total correctamente. |
+| **Flujo/Estados**| TC-FL-02 | Ciclo de vida: Transición "Listo" a "Cobrar". | Paso Secuencial | Clic en "Cobrar" | Transición de Estados | Abre el Modal de Cobro y hereda los datos de ítems y total correctamente. |
 | **Historial** | TC-HI-01 | Filtrado de vistas: Orden pagada. | Post-condición Pago | Clic en "Confirmar Pago" | Partición Equivalencia | La orden se elimina de "Órdenes Activas" y aparece en "Historial de Ventas". |
 | **Historial** | TC-HI-02 | Ver Historial: Integridad de datos del cliente. | Clase Válida | Clic en "Ver Historial" | Partición Equivalencia | Se muestra ID Orden, Nombre/DNI capturado en cobro y el total exacto cobrado. |

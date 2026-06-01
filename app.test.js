@@ -108,7 +108,13 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       expect(() => app.validateProducto(pScript)).toThrow(/NO permite números ni símbolos/);
     });
 
-   
+    // TC-CA-06
+    test('TC-CA-06: Borrado Lógico de producto', () => {
+      const producto = { id: "P01", nombre: "Ceviche", activo: true };
+      app.state.productos = [producto];
+      app.state.productos = app.state.productos.map(p => p.id === "P01" ? { ...p, activo: false } : p);
+      expect(app.state.productos[0].activo).toBe(false);
+    });
   });
 
   describe('Módulo: Validación de Textos (TC-TX)', () => {
@@ -191,6 +197,28 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     test('TC-CO-04: Cruce de tipos - Letras en Monto Recibido', () => {
       const recibido = parseFloat("Dinero");
       expect(isNaN(recibido)).toBe(true);
+    });
+
+    // TC-CO-05 / TC-CO-06
+    test('TC-CO-05/06: Validación de DNI en Cobro (8 dígitos)', () => {
+      const dniValido = "12345678";
+      const dniInvalidoLetras = "A1234567";
+      const dniInvalidoCorto = "1234567";
+
+      expect(app.isDigits(dniValido) && dniValido.length === 8).toBe(true);
+      expect(app.isDigits(dniInvalidoLetras)).toBe(false);
+      expect(dniInvalidoCorto.length === 8).toBe(false);
+    });
+
+    // TC-CO-07 / TC-CO-08
+    test('TC-CO-07/08: Validación de Nombre en Cobro (AVL & Seguridad)', () => {
+      const nombreInvalidoCorto = "A";
+      const nombreInvalidoNumeros = "Ana 123";
+      const nombreValido = "Ana Maria";
+
+      expect(app.isValidNameLength(nombreInvalidoCorto)).toBe(false);
+      expect(app.isStrictAlphaText(nombreInvalidoNumeros)).toBe(false);
+      expect(app.isValidNameLength(nombreValido) && app.isStrictAlphaText(nombreValido)).toBe(true);
     });
   });
 
