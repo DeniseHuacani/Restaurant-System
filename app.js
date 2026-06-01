@@ -119,6 +119,12 @@ const dashboardMesaDeshabilitada = document.getElementById(
 const dashboardMeseroBody = document.getElementById("dashboard-mesero-body");
 const dashboardMeseroEmpty = document.getElementById("dashboard-mesero-empty");
 
+const historyModal = document.getElementById("history-modal");
+const historyBody = document.getElementById("history-body");
+const historyEmpty = document.getElementById("history-empty");
+const btnVerHistorial = document.getElementById("btn-ver-historial");
+const historyModalClose = document.getElementById("history-modal-close");
+
 const globalError = document.getElementById("global-error");
 
 function loadList(key) {
@@ -1168,9 +1174,13 @@ function renderOrdenSelects() {
 
 function renderOrdenes() {
   ordenBody.innerHTML = "";
-  ordenEmpty.style.display = state.ordenes.length ? "none" : "block";
+  
+  // 1. FILTRADO: Solo mostramos órdenes operativas (que NO han sido PAGADAS)
+  const activeOrders = state.ordenes.filter((o) => o.estado !== "PAGADO");
+  
+  ordenEmpty.style.display = activeOrders.length ? "none" : "block";
 
-  state.ordenes.forEach((orden) => {
+  activeOrders.forEach((orden) => {
     const row = document.createElement("tr");
     row.appendChild(createCell(orden.id));
     row.appendChild(createCell(formatOrderType(orden.tipo)));
@@ -1231,6 +1241,38 @@ function renderOrdenes() {
 
   renderOrdenSelects();
   renderDashboardTables();
+}
+
+/**
+ * Renderiza la tabla dentro del modal de historial de ventas
+ */
+function renderHistoryTable() {
+  historyBody.innerHTML = "";
+  // Filtramos solo las órdenes que ya fueron cobradas con éxito
+  const salesHistory = state.ordenes.filter((o) => o.estado === "PAGADO");
+  
+  historyEmpty.classList.toggle("hidden", salesHistory.length > 0);
+  
+  salesHistory.forEach((orden) => {
+    const row = document.createElement("tr");
+    row.appendChild(createCell(orden.id));
+    row.appendChild(createCell(formatOrderType(orden.tipo)));
+    
+    // Datos del cliente guardados durante el proceso de cobro
+    const cliente = orden.clienteNombre || orden.cliente || "Público General";
+    const dni = orden.clienteDni || "-";
+    row.appendChild(createCell(`${cliente} (ID: ${dni})`));
+
+    // Resumen corto de platillos
+    const itemsSummary = orden.items.map(i => `${i.nombre} x${i.cantidad}`).join(", ");
+    row.appendChild(createCell(itemsSummary || "Sin consumo"));
+
+    // Monto final cobrado (incluyendo recargos si aplican)
+    const totals = calculateOrderTotals(orden);
+    row.appendChild(createCell(`S/ ${formatCents(totals.totalCents)}`));
+
+    historyBody.appendChild(row);
+  });
 }
 
 function renderDashboardSummary() {
@@ -2046,6 +2088,13 @@ function bindEvents() {
   itemsModalClose.addEventListener("click", closeItemsModal);
   itemsModalCancel.addEventListener("click", closeItemsModal);
   
+  btnVerHistorial.addEventListener("click", () => {
+    renderHistoryTable();
+    historyModal.classList.remove("hidden");
+  });
+  historyModalClose.addEventListener("click", () => historyModal.classList.add("hidden"));
+  document.getElementById("history-modal-overlay").addEventListener("click", () => historyModal.classList.add("hidden"));
+
   billingForm.addEventListener("submit", handleBillingSubmit);
   billingReceivedAmount.addEventListener("input", updateBillingChange);
   billingModalClose.addEventListener("click", closeBillingModal);

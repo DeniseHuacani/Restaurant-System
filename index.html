@@ -370,10 +370,18 @@
             <div
               class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
             >
-              <div class="p-md border-b border-outline-variant">
+              <div class="p-md border-b border-outline-variant flex justify-between items-center">
                 <h3 class="font-headline-sm text-headline-sm">
-                  Órdenes Activas e Históricas
+                  Órdenes Activas
                 </h3>
+                <button
+                  id="btn-ver-historial"
+                  class="flex items-center gap-xs px-sm py-xs bg-secondary-container text-on-secondary-container rounded-lg font-label-md hover:opacity-90 transition-all"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]">history</span>
+                  Ver Historial de Ventas
+                </button>
               </div>
               <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -1029,6 +1037,33 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE HISTORIAL DE VENTAS (ÓRDENES PAGADAS) -->
+    <div id="history-modal" class="fixed inset-0 z-[60] flex items-center justify-center hidden">
+      <div class="absolute inset-0 modal-overlay" id="history-modal-overlay"></div>
+      <div class="relative bg-surface p-xl rounded-xl border border-outline-variant shadow-xl w-full max-w-5xl modal-content flex flex-col">
+        <div class="flex justify-between items-center mb-md">
+          <h3 class="font-headline-md text-headline-md">Historial de Ventas</h3>
+          <button type="button" class="material-symbols-outlined hover:bg-surface-container-high p-xs rounded-full" id="history-modal-close">close</button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-container-low border-b border-outline-variant">
+              <tr>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">ID</th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">Tipo</th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">Cliente / DNI</th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">Items Consumidos</th>
+                <th class="p-md font-label-md text-label-md text-on-surface-variant">Total Cobrado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant" id="history-body"></tbody>
+          </table>
+          <p id="history-empty" class="text-on-surface-variant text-body-md px-md py-sm hidden">No hay ventas finalizadas para mostrar.</p>
         </div>
       </div>
     </div>
