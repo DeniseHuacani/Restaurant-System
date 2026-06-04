@@ -1,6 +1,6 @@
 # Documentación Técnica: Matriz de Casos de Prueba (Caja Negra) - RestSystem MVP
 
-| Módulo / Rol | ID Caso | Rango / Clase / Descripción | Límite (Frontera) | Valor de Entrada (Datos) | Tipo de Técnica | Resultado Esperado |
+| Módulo / Rol | ID  | Descripción | Límite (Frontera) | Valor de Entrada | Tipo de Técnica | Resultado Esperado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Mesas** | TC-ME-01 | Autocalcular ID y Número de Mesa al crear nueva mesa. | Correlativo + 1 | Clic en "Mesas" (Reset) | Análisis Valores Límite | El campo ID muestra "M05" y Numero "5" (si hay 4 previas) como `readonly`. |
 | **Mesas** | TC-ME-02 | Capacidad de mesa: Valor mínimo permitido. | Límite Inferior (1) | Capacidad = 1 | Análisis Valores Límite | Registro exitoso de la mesa con capacidad mínima. |
