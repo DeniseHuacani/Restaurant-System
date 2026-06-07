@@ -27,6 +27,74 @@ const state = {
   loadError: null,
 };
 
+// Módulos: intentar cargarlos en Node (tests) o usar window.App en el navegador
+let MODULES = {};
+(function loadModules() {
+  if (typeof module !== 'undefined' && module.exports) {
+    try {
+      MODULES.utils = require('./js/utils.js');
+      MODULES.stateModule = require('./js/state.js');
+      MODULES.validation = require('./js/validation.js');
+    } catch (e) {
+      // Ignorar si los módulos no existen en este entorno (p. ej. antes de crear archivos)
+    }
+  } else if (typeof window !== 'undefined') {
+    MODULES = window.App || {};
+  }
+
+  // Mapear utilitarios si están disponibles
+  if (MODULES.utils) {
+    try {
+      normalizeText = MODULES.utils.normalizeText || normalizeText;
+      normalizeId = MODULES.utils.normalizeId || normalizeId;
+      isId = MODULES.utils.isId || isId;
+      isStrictAlphaText = MODULES.utils.isStrictAlphaText || isStrictAlphaText;
+      isDigits = MODULES.utils.isDigits || isDigits;
+      isValidPrice = MODULES.utils.isValidPrice || isValidPrice;
+      formatPrice = MODULES.utils.formatPrice || formatPrice;
+      formatCents = MODULES.utils.formatCents || formatCents;
+      parsePriceToCents = MODULES.utils.parsePriceToCents || parsePriceToCents;
+      formatOrderType = MODULES.utils.formatOrderType || formatOrderType;
+      normalizeOrderType = MODULES.utils.normalizeOrderType || normalizeOrderType;
+    } catch (e) { /* ignore */ }
+  }
+
+  if (MODULES.stateModule) {
+    try {
+      ensureMesaDefaults = MODULES.stateModule.ensureMesaDefaults || ensureMesaDefaults;
+      ensureOrderDefaults = MODULES.stateModule.ensureOrderDefaults || ensureOrderDefaults;
+      calculateOrderTotals = MODULES.stateModule.calculateOrderTotals || calculateOrderTotals;
+      getOrderProductIds = (o) => (MODULES.stateModule.getOrderProductIds ? MODULES.stateModule.getOrderProductIds(o) : getOrderProductIds(o));
+      hasProductOrders = (productId) => (MODULES.stateModule.hasProductOrders ? MODULES.stateModule.hasProductOrders(productId, state) : hasProductOrders(productId));
+      getActiveOrdersByMesaId = (mesaId) => (MODULES.stateModule.getActiveOrdersByMesaId ? MODULES.stateModule.getActiveOrdersByMesaId(mesaId, state) : getActiveOrdersByMesaId(mesaId));
+      getOrdersByMeseroId = (meseroId) => (MODULES.stateModule.getOrdersByMeseroId ? MODULES.stateModule.getOrdersByMeseroId(meseroId, state) : getOrdersByMeseroId(meseroId));
+      getOrdenesActivas = () => (MODULES.stateModule.getOrdenesActivas ? MODULES.stateModule.getOrdenesActivas(state) : getOrdenesActivas());
+      getHistorialVentas = () => (MODULES.stateModule.getHistorialVentas ? MODULES.stateModule.getHistorialVentas(state) : getHistorialVentas());
+      canModifyOrderItems = MODULES.stateModule.canModifyOrderItems || canModifyOrderItems;
+      getNextMesaId = () => (MODULES.stateModule.getNextMesaId ? MODULES.stateModule.getNextMesaId(state) : getNextMesaId());
+      getNextMesaNumero = () => (MODULES.stateModule.getNextMesaNumero ? MODULES.stateModule.getNextMesaNumero(state) : getNextMesaNumero());
+      getNextMeseroId = () => (MODULES.stateModule.getNextMeseroId ? MODULES.stateModule.getNextMeseroId(state) : getNextMeseroId());
+      getNextProductoId = () => (MODULES.stateModule.getNextProductoId ? MODULES.stateModule.getNextProductoId(state) : getNextProductoId());
+      getNextOrderId = () => (MODULES.stateModule.getNextOrderId ? MODULES.stateModule.getNextOrderId(state) : getNextOrderId());
+      getNextOrderState = MODULES.stateModule.getNextOrderState || getNextOrderState;
+      procesarCobro = MODULES.stateModule.procesarCobro || procesarCobro;
+      loadList = (k) => (MODULES.stateModule.loadList ? MODULES.stateModule.loadList(k) : loadList(k));
+      saveList = (k, v) => (MODULES.stateModule.saveList ? MODULES.stateModule.saveList(k, v) : saveList(k, v));
+      initState = async () => (MODULES.stateModule.initState ? MODULES.stateModule.initState(state) : initState());
+    } catch (e) { /* ignore */ }
+  }
+
+  if (MODULES.validation) {
+    try {
+      validateMesa = (input) => MODULES.validation.validateMesa(state, input);
+      validateMesero = (input) => MODULES.validation.validateMesero(state, input);
+      validateProducto = (input) => MODULES.validation.validateProducto(state, input);
+      validateOrden = (input) => MODULES.validation.validateOrden(state, input);
+      validateOrdenItem = (input) => MODULES.validation.validateOrdenItem(state, input);
+    } catch (e) { /* ignore */ }
+  }
+})();
+
 class ValidationError extends Error {
   constructor(errors) {
     super(errors.join("\n"));
@@ -127,16 +195,27 @@ const historyModalClose = document.getElementById("history-modal-close");
 
 const globalError = document.getElementById("global-error");
 
-function loadList(key) {
-  const raw = localStorage.getItem(key);
-  if (!raw) {
-    return [];
+let apiModule = null;
+
+async function tryLoadApiModule() {
+  if (apiModule || typeof window === 'undefined' || !window.fetch) return;
+  try {
+    apiModule = await import('./js/services/api.js');
+    console.info('API module cargado: sincronización con backend habilitada.');
+  } catch (err) {
+    console.warn('No se pudo cargar el módulo API, se usará almacenamiento local.', err);
+    apiModule = null;
   }
+}
+
+function loadList(key) {
+  // Fallback sincrónico (entorno de pruebas/node): leer localStorage si existe
+  if (typeof window === 'undefined' || !window.localStorage) return [];
+  const raw = localStorage.getItem(key);
+  if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      throw new Error(`Formato invalido para ${key}.`);
-    }
+    if (!Array.isArray(parsed)) throw new Error(`Formato invalido para ${key}.`);
     return parsed;
   } catch (error) {
     throw new Error(`Error leyendo ${key}: ${error.message}`);
@@ -144,166 +223,73 @@ function loadList(key) {
 }
 
 function saveList(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-/**
- * Inyecta datos de prueba iniciales (Mock Data).
- * Esta función solo se invoca si el sistema detecta que no hay datos previos.
- */
-function seedMockData() {
-    
-    const mockMesas = [
-      { id: "M01", numero: 1, capacidad: 4, estado: "LIBRE", habilitada: true, activo: true },
-      { id: "M02", numero: 2, capacidad: 2, estado: "LIBRE", habilitada: true, activo: true },
-      { id: "M03", numero: 3, capacidad: 6, estado: "LIBRE", habilitada: true, activo: true },
-      { id: "M04", numero: 4, capacidad: 4, estado: "LIBRE", habilitada: true, activo: true },
-    ];
-    saveList(STORAGE_KEYS.mesas, mockMesas);
-
-    const mockMeseros = [
-      { id: "W01", nombre: "Juan Perez", dni: "12345678", celular: "987654321", estado: "ACTIVO", activo: true },
-      { id: "W02", nombre: "Maria Garcia", dni: "87654321", celular: "912345678", estado: "ACTIVO", activo: true },
-      { id: "W03", nombre: "Pedro Rodriguez", dni: "45678912", celular: "945612378", estado: "ACTIVO", activo: true },
-    ];
-    saveList(STORAGE_KEYS.meseros, mockMeseros);
-
-    
-    const mockProductos = [
-      // --- ENTRADAS Y ENTRANTES ---
-      { 
-        id: "P01", 
-        nombre: "Rocoto Relleno con Pastel de Papa", 
-        precio: "28.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Rocoto desvenado relleno de carne picada a cuchillo, pasas y aceituna, cubierto de queso derretido y acompañado de su clásico pastel de papa horneado." 
-      },
-      { 
-        id: "P02", 
-        nombre: "Solterito de Queso", 
-        precio: "18.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Ensalada fresca y colorida de habas tiernas, choclo desgranado, queso fresco en cubos, aceitunas negras, tomate y cebolla, aliñada con aceite y vinagre." 
-      },
-      { 
-        id: "P03", 
-        nombre: "Ocopa Tradicional", 
-        precio: "16.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Rodajas de papas sancochadas bañadas en una cremosa salsa de huacatay, maní y queso, hecha en batán. Acompañada de huevo duro y aceituna." 
-      },
-      { 
-        id: "P04", 
-        nombre: "Escribano", 
-        precio: "14.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Papas machacadas con tomate, rocoto picadito, vinagre y un chorro de aceite." 
-      },
-
-      // --- LOS SEGUNDOS Y PICANTES ---
-      { 
-        id: "P05", 
-        nombre: "Cuy Chactado", 
-        precio: "55.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Cuy entero tierno, aderezado y frito bajo el peso de una piedra de batán hasta quedar perfectamente crocante. Servido con papas doradas y ensalada." 
-      },
-      { 
-        id: "P06", 
-        nombre: "Costillar Dorado", 
-        precio: "42.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Costilla de cordero de leche, sazonada con ají y ajo, frita hasta quedar doradita por fuera y jugosa por dentro. Viene con papas fritas y ensalada criolla." 
-      },
-      { 
-        id: "P07", 
-        nombre: "Malaya Frita", 
-        precio: "38.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Falda de res sancochada con especias y luego dorada a la sartén. Se sirve con papas doradas y una buena porción de sarza de cebolla." 
-      },
-      { 
-        id: "P08", 
-        nombre: "El Triple Picantero", 
-        precio: "45.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Combinado de tres clásicos en un solo plato: Rocoto relleno, Pastel de papa y un picante del día (Matasquita o Ají de calabaza)." 
-      },
-
-      // --- BEBIDAS ---
-      { 
-        id: "P09", 
-        nombre: "Chicha de Jora (Caporal)", 
-        precio: "8.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Néctar de maíz fermentado artesanalmente. El maridaje obligatorio de toda picantería." 
-      },
-      { 
-        id: "P10", 
-        nombre: "Chicha Morada Helada (Jarra)", 
-        precio: "15.00", 
-        disponibilidad: true, 
-        estado: true,
-        activo: true, 
-        descripcion: "Preparada en casa con maíz morado, piña, membrillo, manzana y un toque de limón." 
-      }
-    ];
-
-    saveList(STORAGE_KEYS.productos, mockProductos);
-}
-
-function initState() {
-  try {
-    // 1. CONTROL DE PERSISTENCIA REAL: Verificar si el almacenamiento no existe o tiene arreglos vacíos
-    let isAppEmpty = false;
+  // Sincronización optimista: enviar asíncronamente al backend si el módulo API está disponible
+  if (apiModule) {
     try {
-      isAppEmpty = loadList(STORAGE_KEYS.mesas).length === 0 || 
-                   loadList(STORAGE_KEYS.meseros).length === 0 || 
-                   loadList(STORAGE_KEYS.productos).length === 0;
-    } catch (e) { // Parche: Si el JSON es corrupto, tratamos como vacío para evitar crash
-      isAppEmpty = true; // Si hay error de formato, tratamos como vacío para regenerar
+      if (key === STORAGE_KEYS.mesas) {
+        apiModule.upsertMesas(value).catch((e) => console.error('Error sincronizando mesas:', e));
+      } else if (key === STORAGE_KEYS.meseros) {
+        apiModule.upsertMeseros(value).catch((e) => console.error('Error sincronizando meseros:', e));
+      } else if (key === STORAGE_KEYS.productos) {
+        apiModule.upsertProductos(value).catch((e) => console.error('Error sincronizando productos:', e));
+      } else if (key === STORAGE_KEYS.ordenes) {
+        apiModule.upsertOrdenes(value).catch((e) => console.error('Error sincronizando ordenes:', e));
+      } else {
+        console.warn('Clave de almacenamiento desconocida:', key);
+      }
+      return;
+    } catch (e) {
+      console.error('Error iniciando sincronización:', e);
+    }
+  }
+
+  // Fallback local (para entorno de pruebas o si no hay backend)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+}
+
+async function initState() {
+  try {
+    await tryLoadApiModule();
+
+    if (apiModule) {
+      try {
+        const [mesas, meseros, productos, ordenes] = await Promise.all([
+          apiModule.fetchMesas(),
+          apiModule.fetchMeseros(),
+          apiModule.fetchProductos(),
+          apiModule.fetchOrdenesWithItems()
+        ]);
+        state.mesas = mesas.map(ensureMesaDefaults);
+        state.meseros = meseros;
+        state.productos = productos;
+        state.ordenes = ordenes.map(ensureOrderDefaults);
+        renderAll();
+        return;
+      } catch (err) {
+        console.warn('Error cargando datos desde API, se intentará con almacenamiento local:', err);
+      }
     }
 
-    if (isAppEmpty) {
-      seedMockData();
-    }
-
-    // 2. CARGA DINÁMICA CON TRAZABILIDAD
+    // Fallback a almacenamiento local
     try {
       state.mesas = loadList(STORAGE_KEYS.mesas).map(ensureMesaDefaults);
-    } catch (e) { }
+    } catch (e) { state.mesas = []; }
 
     try {
       state.meseros = loadList(STORAGE_KEYS.meseros);
-    } catch (e) { }
+    } catch (e) { state.meseros = []; }
 
     try {
       state.productos = loadList(STORAGE_KEYS.productos);
-    } catch (e) { }
+    } catch (e) { state.productos = []; }
 
     try {
       state.ordenes = loadList(STORAGE_KEYS.ordenes).map(ensureOrderDefaults);
-    } catch (e) { }
+    } catch (e) { state.ordenes = []; }
 
-    // 3. DISPARAR RENDERIZADO INICIAL
+    // Renderizado inicial
     renderAll();
 
   } catch (error) {
@@ -2458,9 +2444,9 @@ function renderAll() {
 
 // 1. EVENTO DE CARGA (DOMContentLoaded):
 // Garantiza que el HTML esté listo antes de ejecutar la lógica de inicialización.
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Inicializa los datos (y dispara el renderizado interno)
-  initState();
+  await initState();
   // Vincula los eventos de los formularios y botones
   bindEvents();
 
@@ -2497,4 +2483,30 @@ if (typeof module !== 'undefined' && module.exports) {
     getNextMeseroId,
     getNextProductoId
   };
+}
+
+
+
+async function probarAPI() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:3000/api/productos"
+        );
+
+        const data = await response.json();
+
+        console.log("DATOS API:", data);
+
+    } catch(error) {
+
+        console.error("ERROR API:", error);
+
+    }
+
+}
+
+if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
+  probarAPI();
 }
