@@ -1,442 +1,788 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>RestoFlow POS - Waiter Management</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .sidebar-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .sidebar-scroll::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>RestoFlow POS - Waiter Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .sidebar-scroll::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar-scroll::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
     </style>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "outline-variant": "#c6c6cd",
-                        "tertiary-fixed": "#fcdeb5",
-                        "tertiary-fixed-dim": "#dec29a",
-                        "on-error-container": "#93000a",
-                        "on-secondary-container": "#54647a",
-                        "on-primary-container": "#7c839b",
-                        "primary-fixed": "#dae2fd",
-                        "surface": "#fcf8fa",
-                        "on-secondary-fixed-variant": "#38485d",
-                        "background": "#fcf8fa",
-                        "inverse-primary": "#bec6e0",
-                        "on-surface-variant": "#45464d",
-                        "on-secondary-fixed": "#0b1c30",
-                        "error": "#ba1a1a",
-                        "on-tertiary": "#ffffff",
-                        "secondary-container": "#d0e1fb",
-                        "on-background": "#1b1b1d",
-                        "on-tertiary-fixed-variant": "#574425",
-                        "surface-container": "#f0edef",
-                        "on-primary-fixed-variant": "#3f465c",
-                        "outline": "#76777d",
-                        "secondary-fixed": "#d3e4fe",
-                        "surface-container-low": "#f6f3f5",
-                        "secondary": "#505f76",
-                        "on-tertiary-container": "#98805d",
-                        "error-container": "#ffdad6",
-                        "primary-fixed-dim": "#bec6e0",
-                        "on-surface": "#1b1b1d",
-                        "surface-tint": "#565e74",
-                        "tertiary": "#000000",
-                        "on-tertiary-fixed": "#271901",
-                        "surface-container-high": "#eae7e9",
-                        "on-secondary": "#ffffff",
-                        "primary": "#000000",
-                        "surface-dim": "#dcd9db",
-                        "on-primary": "#ffffff",
-                        "surface-container-lowest": "#ffffff",
-                        "surface-container-highest": "#e4e2e4",
-                        "inverse-on-surface": "#f3f0f2",
-                        "surface-bright": "#fcf8fa",
-                        "on-error": "#ffffff",
-                        "on-primary-fixed": "#131b2e",
-                        "surface-variant": "#e4e2e4",
-                        "primary-container": "#131b2e",
-                        "secondary-fixed-dim": "#b7c8e1",
-                        "inverse-surface": "#303032",
-                        "tertiary-container": "#271901"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "spacing": {
-                        "md": "16px",
-                        "base": "4px",
-                        "xl": "32px",
-                        "xs": "8px",
-                        "sm": "12px",
-                        "sidebar-width": "320px",
-                        "lg": "24px",
-                        "gutter": "16px"
-                    },
-                    "fontFamily": {
-                        "body-lg": ["Inter"],
-                        "headline-sm": ["Inter"],
-                        "data-mono": ["JetBrains Mono"],
-                        "display": ["Inter"],
-                        "label-md": ["Inter"],
-                        "headline-md": ["Inter"],
-                        "body-md": ["Inter"]
-                    },
-                    "fontSize": {
-                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
-                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
-                        "display": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
-                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
-                    }
-                },
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c6c6cd",
+              "tertiary-fixed": "#fcdeb5",
+              "tertiary-fixed-dim": "#dec29a",
+              "on-error-container": "#93000a",
+              "on-secondary-container": "#54647a",
+              "on-primary-container": "#7c839b",
+              "primary-fixed": "#dae2fd",
+              surface: "#fcf8fa",
+              "on-secondary-fixed-variant": "#38485d",
+              background: "#fcf8fa",
+              "inverse-primary": "#bec6e0",
+              "on-surface-variant": "#45464d",
+              "on-secondary-fixed": "#0b1c30",
+              error: "#ba1a1a",
+              "on-tertiary": "#ffffff",
+              "secondary-container": "#d0e1fb",
+              "on-background": "#1b1b1d",
+              "on-tertiary-fixed-variant": "#574425",
+              "surface-container": "#f0edef",
+              "on-primary-fixed-variant": "#3f465c",
+              outline: "#76777d",
+              "secondary-fixed": "#d3e4fe",
+              "surface-container-low": "#f6f3f5",
+              secondary: "#505f76",
+              "on-tertiary-container": "#98805d",
+              "error-container": "#ffdad6",
+              "primary-fixed-dim": "#bec6e0",
+              "on-surface": "#1b1b1d",
+              "surface-tint": "#565e74",
+              tertiary: "#000000",
+              "on-tertiary-fixed": "#271901",
+              "surface-container-high": "#eae7e9",
+              "on-secondary": "#ffffff",
+              primary: "#000000",
+              "surface-dim": "#dcd9db",
+              "on-primary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#e4e2e4",
+              "inverse-on-surface": "#f3f0f2",
+              "surface-bright": "#fcf8fa",
+              "on-error": "#ffffff",
+              "on-primary-fixed": "#131b2e",
+              "surface-variant": "#e4e2e4",
+              "primary-container": "#131b2e",
+              "secondary-fixed-dim": "#b7c8e1",
+              "inverse-surface": "#303032",
+              "tertiary-container": "#271901",
             },
-        }
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            spacing: {
+              md: "16px",
+              base: "4px",
+              xl: "32px",
+              xs: "8px",
+              sm: "12px",
+              "sidebar-width": "320px",
+              lg: "24px",
+              gutter: "16px",
+            },
+            fontFamily: {
+              "body-lg": ["Inter"],
+              "headline-sm": ["Inter"],
+              "data-mono": ["JetBrains Mono"],
+              display: ["Inter"],
+              "label-md": ["Inter"],
+              "headline-md": ["Inter"],
+              "body-md": ["Inter"],
+            },
+            fontSize: {
+              "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "headline-sm": [
+                "18px",
+                { lineHeight: "24px", fontWeight: "600" },
+              ],
+              "data-mono": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+              display: [
+                "30px",
+                {
+                  lineHeight: "38px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "label-md": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                { lineHeight: "32px", fontWeight: "600" },
+              ],
+              "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            },
+          },
+        },
+      };
     </script>
-</head>
-<body class="bg-background text-on-background font-body-md overflow-hidden">
-<!-- TopNavBar (Shared Component) -->
-<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface-container border-b border-outline-variant dark:border-outline">
-<div class="flex items-center gap-md">
-<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">RestoFlow POS</span>
-</div>
-<div class="flex items-center gap-lg">
-<div class="hidden md:flex items-center gap-md">
-<!-- Navigation links would go here if provided in JSON -->
-</div>
-<div class="flex items-center gap-sm">
-<button class="material-symbols-outlined p-xs rounded-full hover:bg-surface-container-low transition-colors">notifications</button>
-<button class="material-symbols-outlined p-xs rounded-full hover:bg-surface-container-low transition-colors">account_circle</button>
-</div>
-</div>
-</header>
-<!-- SideNavBar (Shared Component) -->
-<nav class="fixed left-0 top-16 h-[calc(100vh-64px)] flex flex-col p-md z-40 bg-surface-container dark:bg-surface-container-low border-r border-outline-variant dark:border-outline w-64">
-<div class="flex flex-col gap-base mb-lg px-xs">
-<div class="flex items-center gap-sm p-sm">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-on-primary">person</span>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-[14px] font-black text-on-surface">Admin Portal</span>
-<span class="text-[11px] text-on-surface-variant">Floor Manager</span>
-</div>
-</div>
-<button class="w-full bg-primary text-on-primary py-sm rounded-xl font-label-md flex items-center justify-center gap-xs mt-base hover:opacity-80 transition-all">
-<span class="material-symbols-outlined text-body-md">add</span>
-                New Shift
+  </head>
+  <body class="bg-background text-on-background font-body-md overflow-hidden">
+    <!-- TopNavBar (Shared Component) -->
+    <header
+      class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface-container border-b border-outline-variant dark:border-outline"
+    >
+      <div class="flex items-center gap-md">
+        <span
+          class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed"
+          >RestoFlow POS</span
+        >
+      </div>
+      <div class="flex items-center gap-lg">
+        <div class="hidden md:flex items-center gap-md">
+          <!-- Navigation links would go here if provided in JSON -->
+        </div>
+        <div class="flex items-center gap-sm">
+          <button
+            class="material-symbols-outlined p-xs rounded-full hover:bg-surface-container-low transition-colors"
+          >
+            notifications
+          </button>
+          <button
+            class="material-symbols-outlined p-xs rounded-full hover:bg-surface-container-low transition-colors"
+          >
+            account_circle
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- SideNavBar (Shared Component) -->
+    <nav
+      class="fixed left-0 top-16 h-[calc(100vh-64px)] flex flex-col p-md z-40 bg-surface-container dark:bg-surface-container-low border-r border-outline-variant dark:border-outline w-64"
+    >
+      <div class="flex flex-col gap-base mb-lg px-xs">
+        <div class="flex items-center gap-sm p-sm">
+          <div
+            class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-on-primary"
+              >person</span
+            >
+          </div>
+          <div class="flex flex-col">
+            <span
+              class="font-headline-sm text-[14px] font-black text-on-surface"
+              >Admin Portal</span
+            >
+            <span class="text-[11px] text-on-surface-variant"
+              >Floor Manager</span
+            >
+          </div>
+        </div>
+        <button
+          class="w-full bg-primary text-on-primary py-sm rounded-xl font-label-md flex items-center justify-center gap-xs mt-base hover:opacity-80 transition-all"
+        >
+          <span class="material-symbols-outlined text-body-md">add</span>
+          New Shift
+        </button>
+      </div>
+      <div class="flex flex-col gap-base flex-grow">
+        <a
+          class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl"
+          href="#"
+        >
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-label-md">Dashboard</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl"
+          href="#"
+        >
+          <span class="material-symbols-outlined">menu_book</span>
+          <span class="font-label-md">Catalog</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl"
+          href="#"
+        >
+          <span class="material-symbols-outlined">table_restaurant</span>
+          <span class="font-label-md">Tables</span>
+        </a>
+        <!-- Active State: Waiters -->
+        <a
+          class="flex items-center gap-md px-md py-sm bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-xl transition-all"
+          href="#"
+        >
+          <span class="material-symbols-outlined">badge</span>
+          <span class="font-label-md">Waiters</span>
+        </a>
+      </div>
+      <div
+        class="flex flex-col gap-base mt-auto border-t border-outline-variant pt-md"
+      >
+        <a
+          class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl"
+          href="#"
+        >
+          <span class="material-symbols-outlined">settings</span>
+          <span class="font-label-md">Settings</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl"
+          href="#"
+        >
+          <span class="material-symbols-outlined">logout</span>
+          <span class="font-label-md">Logout</span>
+        </a>
+      </div>
+    </nav>
+    <!-- Main Canvas -->
+    <main
+      class="ml-64 mr-sidebar-width mt-16 p-lg h-[calc(100vh-64px)] overflow-y-auto"
+    >
+      <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <div class="flex justify-between items-end mb-xl">
+          <div>
+            <h1 class="font-display text-display text-primary">
+              Waiters Management
+            </h1>
+            <p class="text-secondary font-body-md">
+              Configure staff members and monitor real-time availability.
+            </p>
+          </div>
+          <div class="flex gap-sm">
+            <button
+              class="flex items-center gap-xs px-lg py-sm bg-surface border border-outline rounded-lg font-label-md hover:bg-surface-container-low transition-colors"
+            >
+              <span class="material-symbols-outlined text-body-md"
+                >download</span
+              >
+              Export List
             </button>
-</div>
-<div class="flex flex-col gap-base flex-grow">
-<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl" href="#">
-<span class="material-symbols-outlined">menu_book</span>
-<span class="font-label-md">Catalog</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl" href="#">
-<span class="material-symbols-outlined">table_restaurant</span>
-<span class="font-label-md">Tables</span>
-</a>
-<!-- Active State: Waiters -->
-<a class="flex items-center gap-md px-md py-sm bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-xl transition-all" href="#">
-<span class="material-symbols-outlined">badge</span>
-<span class="font-label-md">Waiters</span>
-</a>
-</div>
-<div class="flex flex-col gap-base mt-auto border-t border-outline-variant pt-md">
-<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-label-md">Settings</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high transition-all rounded-xl" href="#">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-label-md">Logout</span>
-</a>
-</div>
-</nav>
-<!-- Main Canvas -->
-<main class="ml-64 mr-sidebar-width mt-16 p-lg h-[calc(100vh-64px)] overflow-y-auto">
-<div class="max-w-6xl mx-auto">
-<!-- Header Section -->
-<div class="flex justify-between items-end mb-xl">
-<div>
-<h1 class="font-display text-display text-primary">Waiters Management</h1>
-<p class="text-secondary font-body-md">Configure staff members and monitor real-time availability.</p>
-</div>
-<div class="flex gap-sm">
-<button class="flex items-center gap-xs px-lg py-sm bg-surface border border-outline rounded-lg font-label-md hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined text-body-md">download</span>
-                        Export List
-                    </button>
-</div>
-</div>
-<div class="grid grid-cols-12 gap-lg">
-<!-- Registration Form (Bento Style) -->
-<section class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
-<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl">
-<h2 class="font-headline-sm text-headline-sm text-primary mb-md">Register New Waiter</h2>
-<form class="space-y-md">
-<div class="space-y-base">
-<label class="font-label-md text-on-surface-variant">FULL NAME</label>
-<input class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none" placeholder="e.g. Julian Casablancas" type="text"/>
-</div>
-<div class="grid grid-cols-2 gap-md">
-<div class="space-y-base">
-<label class="font-label-md text-on-surface-variant">DNI/ID</label>
-<input class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none" placeholder="12345678X" type="text"/>
-</div>
-<div class="space-y-base">
-<label class="font-label-md text-on-surface-variant">PHONE</label>
-<input class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none" placeholder="+34 600 000 000" type="tel"/>
-</div>
-</div>
-<div class="space-y-base">
-<label class="font-label-md text-on-surface-variant">ASSIGNED ZONE</label>
-<select class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none">
-<option>Main Dining Room</option>
-<option>Terrace</option>
-<option>Bar Area</option>
-<option>VIP Lounge</option>
-</select>
-</div>
-<button class="w-full bg-primary text-on-primary py-md font-label-md rounded-lg mt-md hover:opacity-90 transition-opacity" type="button">
-                                Add Staff Member
-                            </button>
-</form>
-</div>
-<!-- Small Stat Card -->
-<div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between">
-<div>
-<p class="font-label-md opacity-80">TOTAL STAFF</p>
-<h3 class="font-display text-display leading-none">24</h3>
-</div>
-<span class="material-symbols-outlined text-[48px] opacity-20">groups</span>
-</div>
-</section>
-<!-- Waiters Table -->
-<section class="col-span-12 lg:col-span-8">
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
-<div class="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
-<h2 class="font-headline-sm text-headline-sm">Staff Directory</h2>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
-<input class="pl-xl pr-md py-xs bg-surface border border-outline-variant rounded-full text-body-md outline-none focus:border-primary w-64" placeholder="Search staff..." type="text"/>
-</div>
-</div>
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-container-low border-b border-outline-variant">
-<th class="px-lg py-md font-label-md text-on-surface-variant">ID</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant">NAME</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant">DNI</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant">PHONE</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant">STATUS</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant">ACTION</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-outline-variant">
-<tr class="hover:bg-surface-container-low transition-colors">
-<td class="px-lg py-md font-data-mono text-secondary">#W-001</td>
-<td class="px-lg py-md font-body-md font-semibold">Julian Casablancas</td>
-<td class="px-lg py-md font-data-mono text-secondary">48930211L</td>
-<td class="px-lg py-md font-body-md text-secondary">+34 655 432 101</td>
-<td class="px-lg py-md">
-<span class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider">ACTIVE</span>
-</td>
-<td class="px-lg py-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors">
-<td class="px-lg py-md font-data-mono text-secondary">#W-002</td>
-<td class="px-lg py-md font-body-md font-semibold">Sarah Connor</td>
-<td class="px-lg py-md font-data-mono text-secondary">33211094J</td>
-<td class="px-lg py-md font-body-md text-secondary">+34 622 111 009</td>
-<td class="px-lg py-md">
-<span class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider">ACTIVE</span>
-</td>
-<td class="px-lg py-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors">
-<td class="px-lg py-md font-data-mono text-secondary">#W-003</td>
-<td class="px-lg py-md font-body-md font-semibold">David Bowie</td>
-<td class="px-lg py-md font-data-mono text-secondary">99088712K</td>
-<td class="px-lg py-md font-body-md text-secondary">+34 699 888 777</td>
-<td class="px-lg py-md">
-<span class="inline-flex items-center px-sm py-xs rounded-full bg-surface-container-highest text-on-surface-variant text-[10px] font-bold tracking-wider">INACTIVE</span>
-</td>
-<td class="px-lg py-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors">
-<td class="px-lg py-md font-data-mono text-secondary">#W-004</td>
-<td class="px-lg py-md font-body-md font-semibold">Florence Welch</td>
-<td class="px-lg py-md font-data-mono text-secondary">11002233M</td>
-<td class="px-lg py-md font-body-md text-secondary">+34 644 333 222</td>
-<td class="px-lg py-md">
-<span class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider">ACTIVE</span>
-</td>
-<td class="px-lg py-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors">
-<td class="px-lg py-md font-data-mono text-secondary">#W-005</td>
-<td class="px-lg py-md font-body-md font-semibold">Kendrick Lamar</td>
-<td class="px-lg py-md font-data-mono text-secondary">77665544N</td>
-<td class="px-lg py-md font-body-md text-secondary">+34 611 222 333</td>
-<td class="px-lg py-md">
-<span class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider">ACTIVE</span>
-</td>
-<td class="px-lg py-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="p-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
-<span class="text-label-md text-on-surface-variant">Showing 5 of 24 waiters</span>
-<div class="flex gap-xs">
-<button class="p-xs border border-outline-variant rounded hover:bg-surface transition-colors material-symbols-outlined">chevron_left</button>
-<button class="p-xs border border-outline-variant rounded hover:bg-surface transition-colors material-symbols-outlined">chevron_right</button>
-</div>
-</div>
-</div>
-</section>
-</div>
-</div>
-</main>
-<!-- Persistent Product Catalog Sidebar -->
-<aside class="fixed right-0 top-16 h-[calc(100vh-64px)] w-sidebar-width bg-surface border-l border-outline-variant z-40 flex flex-col">
-<div class="p-md border-b border-outline-variant bg-surface-container-lowest">
-<h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Menu Catalog</h3>
-<div class="flex gap-xs overflow-x-auto sidebar-scroll pb-xs">
-<button class="px-md py-xs bg-primary text-on-primary rounded-full font-label-md whitespace-nowrap">All Items</button>
-<button class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors">Drinks</button>
-<button class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors">Main</button>
-<button class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors">Dessert</button>
-</div>
-</div>
-<div class="flex-grow overflow-y-auto sidebar-scroll p-md flex flex-col gap-sm">
-<!-- Product Card -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Healthy Bowl" class="w-full h-full object-cover" data-alt="A vibrant, healthy salad bowl with fresh greens, quinoa, cherry tomatoes, and sliced avocado. The lighting is bright and airy, reflecting a clean and modern restaurant aesthetic. The composition is professional food photography with high contrast and natural textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9qn-31S8hvpbBP_ngpIQikl4sr_KfrkAXu6g5KpBDc3FHrrHvcLcPPqDL6iMo-py7FDQYSWFr_a9p87XumFZlvV337DKQJ2rDOVsR2ij4QpR_9vtlwUyrcEsz8A4LWMm13_c5mx2Wvfbk8Aw9ENSSpkN9Ocamvs5XVVK0NwqiOSnPEE4OC0A6O0A47hlzvCFvRXv2O69JE2QVHYiJ1-IZZ3uklUG28xzinfhzXMfSn-XY9un_JhyJhcX5xR-0D518cz4l7elnioYn"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Avocado Harvest Bowl</h4>
-<p class="font-data-mono text-primary">$12.50</p>
-</div>
-</div>
-<!-- Product Card -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Classic Burger" class="w-full h-full object-cover" data-alt="A gourmet classic burger with melted cheddar cheese, crisp lettuce, and a golden brioche bun. The lighting is warm and dramatic, highlighting the juicy texture of the meat and the sheen of the bun. The background is a sophisticated, dark restaurant setting that emphasizes the premium quality of the food." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8LnrZqfJ1NFxvwOAwZQBI6rzDQV5s0Qie8_GUaIM03GPzM6EJv2yLH_-mygTT6-XRHIWadJz4zxIIKLS_qtexcpaZIhmtCfsq0DOT2OxUSirfdL7D4hHOAhCmupr6ClDbXA_RJyV0vb8DBK9iysbp73n5RaguruYfJMs1W70qG8m-oNt5I4fj8QOZlEjI3ungYE8YVBDkWLpY9QXnUMvQPhh0HpJiSvYlBi9ICDXviowCrv1iswDnhPH_7TVnnV10AAkwu4qWk5x0"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Signature Wagyu Burger</h4>
-<p class="font-data-mono text-primary">$18.00</p>
-</div>
-</div>
-<!-- Product Card -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Steak" class="w-full h-full object-cover" data-alt="A perfectly seared ribeye steak served with aromatic rosemary and roasted garlic cloves. The lighting is intimate and moody, using low-key shadows to create a high-end steakhouse atmosphere. The colors are rich and warm, focusing on the deep browns of the crust and the vibrant greens of the herbs." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI4m1ZxFJEVWtVvbfwX9k1zfBowjswziAtO5mDDQzCBxoJqUx7gAYnlSrduQkVEUUCEmi0azBM9IjZiSlkRgu7YCQabDNvGIcKcq6r-Jbpo4keB2bK6B_bk1FuujMz7t5I8030hiU5KwGhm5PLb5wHzR-4MZ3hzUJHtDhxg6EqCuIZJ7gCpiodhv2hgz4uzhN7x74XpFI2-bRRs0kXEzRPyU4TULMKH00Y45NxnzdteWauR-998Vg37lwbmvmU_JOu4GwtM1-K5Gqj"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Dry-Aged Ribeye</h4>
-<p class="font-data-mono text-primary">$45.00</p>
-</div>
-</div>
-<!-- Product Card -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Donut" class="w-full h-full object-cover" data-alt="An artisanal chocolate glazed donut topped with delicate gold leaf and crushed hazelnuts. The aesthetic is extremely high-end and minimalist, with a soft-focus background in neutral tones. The lighting is soft and diffuse, highlighting the glossy finish of the chocolate and the intricate details of the toppings." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJpsjH8y9CqX1U85iFFAfM89f9WkwKxj7a0M2Ik6Ju7CmlryoLUBWtHZxEB7baSE3KxSuGE0JRw14jqMUzQAvQSRzLUHgTRj5uDJqXj2pLu4AYneq02mWE12-L6lQL7-Wx1mL_D8ifyWxhX15UAHaW-r-XXP0YRmq7GKowMKd6ZkuDU_VkhjyLG91_N1GZSntZb_Xhh4hjtf29D2c-5ijuwwZU_jKSHeMRUE5K8drjqz63XgE1vBfEMsPaNBrbVHwMrBs4gdJpesit"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Gold-Leaf Glazed Donut</h4>
-<p class="font-data-mono text-primary">$7.50</p>
-</div>
-</div>
-<!-- Product Card -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Cocktail" class="w-full h-full object-cover" data-alt="A sophisticated craft cocktail served in a crystal coupe glass, garnished with a single dried orange wheel. The setting is a luxury bar with soft amber lighting reflecting off the glass surfaces. The mood is elegant and nighttime-inspired, featuring a deep color palette of oranges and dark shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvteHv2_bi6zMH6--5Pg_IcjicNXLVUY2ykOyXYGg9OxrZA4xSxjr3_kTU3Rl1_wdRo5UarHneRjOkWPKIt4XPyWv9VsgnYDWGAeXECs7752oNJrox6f6h88XLrgN-XjsmF8PiJrRk9Vn1N-W_hiG2pwCy8T9pns7wWoqBbs86PZQkhrRLs7Q8JWeMNdwaVSzWQW2bou6hDTgXXbm-DVGI6bOnWgzGVqnWZ0jjr32HMSg3hINJCUwAes4oRPQ82XVhNC_yANgdFjD5"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Old Fashioned Reserve</h4>
-<p class="font-data-mono text-primary">$14.00</p>
-</div>
-</div>
-<!-- Repeat item to show scrolling -->
-<div class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img alt="Salmon" class="w-full h-full object-cover" data-alt="Pan-seared Atlantic salmon fillet with crispy skin, served on a bed of bright green asparagus and lemon slices. The lighting is crisp and natural, emphasizing the freshness of the ingredients. The visual style is clean and architectural, highlighting the geometry of the plated dish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdSKbL0bXhrx6EkPAKxDUuFyADrUTQ3ELirsUbbgf89Obpk3ru_p0-cZXFV1Kuybd9TTLWLdINoW2hUboVSQsryBy2rEdlpolLnEGfg2UwBGClOrktzBGJIyCOJidzILVtLV0qyG3-3ja_PEgxXdMJB4LBAmGgAGDo1yt0iRAPmB3qQ_1UDScgxUQow2rk0IN1B5ZT3zlZ5VqRYsgoapLR2cTU-DktIsiTjixjA48z4PYcetpOm136vZ4tN3_fkneLjIVChsV_ThIJ"/>
-</div>
-<div class="flex flex-col justify-center">
-<h4 class="font-body-md font-semibold text-on-surface">Wild Atlantic Salmon</h4>
-<p class="font-data-mono text-primary">$26.00</p>
-</div>
-</div>
-</div>
-<div class="p-md bg-surface-container-low border-t border-outline-variant">
-<button class="w-full bg-primary text-on-primary py-md font-label-md rounded flex items-center justify-center gap-xs">
-<span class="material-symbols-outlined">inventory_2</span>
-                Manage Inventory
-            </button>
-</div>
-</aside>
-<script>
-        // Micro-interaction for table rows
-        document.querySelectorAll('tbody tr').forEach(row => {
-            row.addEventListener('click', () => {
-                row.classList.add('scale-[0.99]');
-                setTimeout(() => row.classList.remove('scale-[0.99]'), 100);
-            });
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-lg">
+          <!-- Registration Form (Bento Style) -->
+          <section class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+            <div
+              class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl"
+            >
+              <h2 class="font-headline-sm text-headline-sm text-primary mb-md">
+                Register New Waiter
+              </h2>
+              <form class="space-y-md">
+                <div class="space-y-base">
+                  <label class="font-label-md text-on-surface-variant"
+                    >FULL NAME</label
+                  >
+                  <input
+                    class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none"
+                    placeholder="e.g. Julian Casablancas"
+                    type="text"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-md">
+                  <div class="space-y-base">
+                    <label class="font-label-md text-on-surface-variant"
+                      >DNI/ID</label
+                    >
+                    <input
+                      class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none"
+                      placeholder="12345678X"
+                      type="text"
+                    />
+                  </div>
+                  <div class="space-y-base">
+                    <label class="font-label-md text-on-surface-variant"
+                      >PHONE</label
+                    >
+                    <input
+                      class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none"
+                      placeholder="+34 600 000 000"
+                      type="tel"
+                    />
+                  </div>
+                </div>
+                <div class="space-y-base">
+                  <label class="font-label-md text-on-surface-variant"
+                    >ASSIGNED ZONE</label
+                  >
+                  <select
+                    class="w-full bg-surface border border-outline-variant px-md py-sm rounded focus:border-primary focus:ring-0 text-body-md outline-none"
+                  >
+                    <option>Main Dining Room</option>
+                    <option>Terrace</option>
+                    <option>Bar Area</option>
+                    <option>VIP Lounge</option>
+                  </select>
+                </div>
+                <button
+                  class="w-full bg-primary text-on-primary py-md font-label-md rounded-lg mt-md hover:opacity-90 transition-opacity"
+                  type="button"
+                >
+                  Add Staff Member
+                </button>
+              </form>
+            </div>
+            <!-- Small Stat Card -->
+            <div
+              class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between"
+            >
+              <div>
+                <p class="font-label-md opacity-80">TOTAL STAFF</p>
+                <h3 class="font-display text-display leading-none">24</h3>
+              </div>
+              <span class="material-symbols-outlined text-[48px] opacity-20"
+                >groups</span
+              >
+            </div>
+          </section>
+          <!-- Waiters Table -->
+          <section class="col-span-12 lg:col-span-8">
+            <div
+              class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden"
+            >
+              <div
+                class="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center"
+              >
+                <h2 class="font-headline-sm text-headline-sm">
+                  Staff Directory
+                </h2>
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md"
+                    >search</span
+                  >
+                  <input
+                    class="pl-xl pr-md py-xs bg-surface border border-outline-variant rounded-full text-body-md outline-none focus:border-primary w-64"
+                    placeholder="Search staff..."
+                    type="text"
+                  />
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr
+                      class="bg-surface-container-low border-b border-outline-variant"
+                    >
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        ID
+                      </th>
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        NAME
+                      </th>
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        DNI
+                      </th>
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        PHONE
+                      </th>
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        STATUS
+                      </th>
+                      <th
+                        class="px-lg py-md font-label-md text-on-surface-variant"
+                      >
+                        ACTION
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline-variant">
+                    <tr
+                      class="hover:bg-surface-container-low transition-colors"
+                    >
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        #W-001
+                      </td>
+                      <td class="px-lg py-md font-body-md font-semibold">
+                        Julian Casablancas
+                      </td>
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        48930211L
+                      </td>
+                      <td class="px-lg py-md font-body-md text-secondary">
+                        +34 655 432 101
+                      </td>
+                      <td class="px-lg py-md">
+                        <span
+                          class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider"
+                          >ACTIVE</span
+                        >
+                      </td>
+                      <td class="px-lg py-md">
+                        <button
+                          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          more_vert
+                        </button>
+                      </td>
+                    </tr>
+                    <tr
+                      class="hover:bg-surface-container-low transition-colors"
+                    >
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        #W-002
+                      </td>
+                      <td class="px-lg py-md font-body-md font-semibold">
+                        Sarah Connor
+                      </td>
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        33211094J
+                      </td>
+                      <td class="px-lg py-md font-body-md text-secondary">
+                        +34 622 111 009
+                      </td>
+                      <td class="px-lg py-md">
+                        <span
+                          class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider"
+                          >ACTIVE</span
+                        >
+                      </td>
+                      <td class="px-lg py-md">
+                        <button
+                          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          more_vert
+                        </button>
+                      </td>
+                    </tr>
+                    <tr
+                      class="hover:bg-surface-container-low transition-colors"
+                    >
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        #W-003
+                      </td>
+                      <td class="px-lg py-md font-body-md font-semibold">
+                        David Bowie
+                      </td>
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        99088712K
+                      </td>
+                      <td class="px-lg py-md font-body-md text-secondary">
+                        +34 699 888 777
+                      </td>
+                      <td class="px-lg py-md">
+                        <span
+                          class="inline-flex items-center px-sm py-xs rounded-full bg-surface-container-highest text-on-surface-variant text-[10px] font-bold tracking-wider"
+                          >INACTIVE</span
+                        >
+                      </td>
+                      <td class="px-lg py-md">
+                        <button
+                          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          more_vert
+                        </button>
+                      </td>
+                    </tr>
+                    <tr
+                      class="hover:bg-surface-container-low transition-colors"
+                    >
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        #W-004
+                      </td>
+                      <td class="px-lg py-md font-body-md font-semibold">
+                        Florence Welch
+                      </td>
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        11002233M
+                      </td>
+                      <td class="px-lg py-md font-body-md text-secondary">
+                        +34 644 333 222
+                      </td>
+                      <td class="px-lg py-md">
+                        <span
+                          class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider"
+                          >ACTIVE</span
+                        >
+                      </td>
+                      <td class="px-lg py-md">
+                        <button
+                          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          more_vert
+                        </button>
+                      </td>
+                    </tr>
+                    <tr
+                      class="hover:bg-surface-container-low transition-colors"
+                    >
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        #W-005
+                      </td>
+                      <td class="px-lg py-md font-body-md font-semibold">
+                        Kendrick Lamar
+                      </td>
+                      <td class="px-lg py-md font-data-mono text-secondary">
+                        77665544N
+                      </td>
+                      <td class="px-lg py-md font-body-md text-secondary">
+                        +34 611 222 333
+                      </td>
+                      <td class="px-lg py-md">
+                        <span
+                          class="inline-flex items-center px-sm py-xs rounded-full bg-green-100 text-green-800 text-[10px] font-bold tracking-wider"
+                          >ACTIVE</span
+                        >
+                      </td>
+                      <td class="px-lg py-md">
+                        <button
+                          class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+                        >
+                          more_vert
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div
+                class="p-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between"
+              >
+                <span class="text-label-md text-on-surface-variant"
+                  >Showing 5 of 24 waiters</span
+                >
+                <div class="flex gap-xs">
+                  <button
+                    class="p-xs border border-outline-variant rounded hover:bg-surface transition-colors material-symbols-outlined"
+                  >
+                    chevron_left
+                  </button>
+                  <button
+                    class="p-xs border border-outline-variant rounded hover:bg-surface transition-colors material-symbols-outlined"
+                  >
+                    chevron_right
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <!-- Persistent Product Catalog Sidebar -->
+    <aside
+      class="fixed right-0 top-16 h-[calc(100vh-64px)] w-sidebar-width bg-surface border-l border-outline-variant z-40 flex flex-col"
+    >
+      <div
+        class="p-md border-b border-outline-variant bg-surface-container-lowest"
+      >
+        <h3 class="font-headline-sm text-headline-sm text-primary mb-sm">
+          Menu Catalog
+        </h3>
+        <div class="flex gap-xs overflow-x-auto sidebar-scroll pb-xs">
+          <button
+            class="px-md py-xs bg-primary text-on-primary rounded-full font-label-md whitespace-nowrap"
+          >
+            All Items
+          </button>
+          <button
+            class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors"
+          >
+            Drinks
+          </button>
+          <button
+            class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors"
+          >
+            Main
+          </button>
+          <button
+            class="px-md py-xs bg-surface-container-high text-on-surface-variant rounded-full font-label-md whitespace-nowrap hover:bg-outline-variant transition-colors"
+          >
+            Dessert
+          </button>
+        </div>
+      </div>
+      <div
+        class="flex-grow overflow-y-auto sidebar-scroll p-md flex flex-col gap-sm"
+      >
+        <!-- Product Card -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Healthy Bowl"
+              class="w-full h-full object-cover"
+              data-alt="A vibrant, healthy salad bowl with fresh greens, quinoa, cherry tomatoes, and sliced avocado. The lighting is bright and airy, reflecting a clean and modern restaurant aesthetic. The composition is professional food photography with high contrast and natural textures."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9qn-31S8hvpbBP_ngpIQikl4sr_KfrkAXu6g5KpBDc3FHrrHvcLcPPqDL6iMo-py7FDQYSWFr_a9p87XumFZlvV337DKQJ2rDOVsR2ij4QpR_9vtlwUyrcEsz8A4LWMm13_c5mx2Wvfbk8Aw9ENSSpkN9Ocamvs5XVVK0NwqiOSnPEE4OC0A6O0A47hlzvCFvRXv2O69JE2QVHYiJ1-IZZ3uklUG28xzinfhzXMfSn-XY9un_JhyJhcX5xR-0D518cz4l7elnioYn"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Avocado Harvest Bowl
+            </h4>
+            <p class="font-data-mono text-primary">$12.50</p>
+          </div>
+        </div>
+        <!-- Product Card -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Classic Burger"
+              class="w-full h-full object-cover"
+              data-alt="A gourmet classic burger with melted cheddar cheese, crisp lettuce, and a golden brioche bun. The lighting is warm and dramatic, highlighting the juicy texture of the meat and the sheen of the bun. The background is a sophisticated, dark restaurant setting that emphasizes the premium quality of the food."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8LnrZqfJ1NFxvwOAwZQBI6rzDQV5s0Qie8_GUaIM03GPzM6EJv2yLH_-mygTT6-XRHIWadJz4zxIIKLS_qtexcpaZIhmtCfsq0DOT2OxUSirfdL7D4hHOAhCmupr6ClDbXA_RJyV0vb8DBK9iysbp73n5RaguruYfJMs1W70qG8m-oNt5I4fj8QOZlEjI3ungYE8YVBDkWLpY9QXnUMvQPhh0HpJiSvYlBi9ICDXviowCrv1iswDnhPH_7TVnnV10AAkwu4qWk5x0"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Signature Wagyu Burger
+            </h4>
+            <p class="font-data-mono text-primary">$18.00</p>
+          </div>
+        </div>
+        <!-- Product Card -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Steak"
+              class="w-full h-full object-cover"
+              data-alt="A perfectly seared ribeye steak served with aromatic rosemary and roasted garlic cloves. The lighting is intimate and moody, using low-key shadows to create a high-end steakhouse atmosphere. The colors are rich and warm, focusing on the deep browns of the crust and the vibrant greens of the herbs."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI4m1ZxFJEVWtVvbfwX9k1zfBowjswziAtO5mDDQzCBxoJqUx7gAYnlSrduQkVEUUCEmi0azBM9IjZiSlkRgu7YCQabDNvGIcKcq6r-Jbpo4keB2bK6B_bk1FuujMz7t5I8030hiU5KwGhm5PLb5wHzR-4MZ3hzUJHtDhxg6EqCuIZJ7gCpiodhv2hgz4uzhN7x74XpFI2-bRRs0kXEzRPyU4TULMKH00Y45NxnzdteWauR-998Vg37lwbmvmU_JOu4GwtM1-K5Gqj"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Dry-Aged Ribeye
+            </h4>
+            <p class="font-data-mono text-primary">$45.00</p>
+          </div>
+        </div>
+        <!-- Product Card -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Donut"
+              class="w-full h-full object-cover"
+              data-alt="An artisanal chocolate glazed donut topped with delicate gold leaf and crushed hazelnuts. The aesthetic is extremely high-end and minimalist, with a soft-focus background in neutral tones. The lighting is soft and diffuse, highlighting the glossy finish of the chocolate and the intricate details of the toppings."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJpsjH8y9CqX1U85iFFAfM89f9WkwKxj7a0M2Ik6Ju7CmlryoLUBWtHZxEB7baSE3KxSuGE0JRw14jqMUzQAvQSRzLUHgTRj5uDJqXj2pLu4AYneq02mWE12-L6lQL7-Wx1mL_D8ifyWxhX15UAHaW-r-XXP0YRmq7GKowMKd6ZkuDU_VkhjyLG91_N1GZSntZb_Xhh4hjtf29D2c-5ijuwwZU_jKSHeMRUE5K8drjqz63XgE1vBfEMsPaNBrbVHwMrBs4gdJpesit"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Gold-Leaf Glazed Donut
+            </h4>
+            <p class="font-data-mono text-primary">$7.50</p>
+          </div>
+        </div>
+        <!-- Product Card -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Cocktail"
+              class="w-full h-full object-cover"
+              data-alt="A sophisticated craft cocktail served in a crystal coupe glass, garnished with a single dried orange wheel. The setting is a luxury bar with soft amber lighting reflecting off the glass surfaces. The mood is elegant and nighttime-inspired, featuring a deep color palette of oranges and dark shadows."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvteHv2_bi6zMH6--5Pg_IcjicNXLVUY2ykOyXYGg9OxrZA4xSxjr3_kTU3Rl1_wdRo5UarHneRjOkWPKIt4XPyWv9VsgnYDWGAeXECs7752oNJrox6f6h88XLrgN-XjsmF8PiJrRk9Vn1N-W_hiG2pwCy8T9pns7wWoqBbs86PZQkhrRLs7Q8JWeMNdwaVSzWQW2bou6hDTgXXbm-DVGI6bOnWgzGVqnWZ0jjr32HMSg3hINJCUwAes4oRPQ82XVhNC_yANgdFjD5"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Old Fashioned Reserve
+            </h4>
+            <p class="font-data-mono text-primary">$14.00</p>
+          </div>
+        </div>
+        <!-- Repeat item to show scrolling -->
+        <div
+          class="flex gap-md p-xs hover:bg-surface-container-low rounded transition-colors group cursor-pointer border border-transparent hover:border-outline-variant"
+        >
+          <div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+            <img
+              alt="Salmon"
+              class="w-full h-full object-cover"
+              data-alt="Pan-seared Atlantic salmon fillet with crispy skin, served on a bed of bright green asparagus and lemon slices. The lighting is crisp and natural, emphasizing the freshness of the ingredients. The visual style is clean and architectural, highlighting the geometry of the plated dish."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdSKbL0bXhrx6EkPAKxDUuFyADrUTQ3ELirsUbbgf89Obpk3ru_p0-cZXFV1Kuybd9TTLWLdINoW2hUboVSQsryBy2rEdlpolLnEGfg2UwBGClOrktzBGJIyCOJidzILVtLV0qyG3-3ja_PEgxXdMJB4LBAmGgAGDo1yt0iRAPmB3qQ_1UDScgxUQow2rk0IN1B5ZT3zlZ5VqRYsgoapLR2cTU-DktIsiTjixjA48z4PYcetpOm136vZ4tN3_fkneLjIVChsV_ThIJ"
+            />
+          </div>
+          <div class="flex flex-col justify-center">
+            <h4 class="font-body-md font-semibold text-on-surface">
+              Wild Atlantic Salmon
+            </h4>
+            <p class="font-data-mono text-primary">$26.00</p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="p-md bg-surface-container-low border-t border-outline-variant"
+      >
+        <button
+          class="w-full bg-primary text-on-primary py-md font-label-md rounded flex items-center justify-center gap-xs"
+        >
+          <span class="material-symbols-outlined">inventory_2</span>
+          Manage Inventory
+        </button>
+      </div>
+    </aside>
+    <script>
+      // Micro-interaction for table rows
+      document.querySelectorAll("tbody tr").forEach((row) => {
+        row.addEventListener("click", () => {
+          row.classList.add("scale-[0.99]");
+          setTimeout(() => row.classList.remove("scale-[0.99]"), 100);
         });
+      });
 
-        // Search filter logic (simulation)
-        const searchInput = document.querySelector('input[placeholder="Search staff..."]');
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('tbody tr').forEach(row => {
-                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                if (name.includes(term)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+      // Search filter logic (simulation)
+      const searchInput = document.querySelector(
+        'input[placeholder="Search staff..."]',
+      );
+      searchInput.addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll("tbody tr").forEach((row) => {
+          const name = row
+            .querySelector("td:nth-child(2)")
+            .textContent.toLowerCase();
+          if (name.includes(term)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
         });
+      });
     </script>
-</body></html>
+  </body>
+</html>

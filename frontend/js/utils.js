@@ -54,6 +54,11 @@
     return whole * 100 + fraction;
   }
 
+  function isValidNameLength(value) {
+    const text = String(value || '').trim();
+    return text.length >= 2 && text.length <= 50;
+  }
+
   function formatOrderType(value) {
     return String(value || '').replace(/_/g, ' ');
   }
@@ -79,5 +84,6 @@
     parsePriceToCents,
     formatOrderType,
     normalizeOrderType,
+    isValidNameLength,
   };
 });

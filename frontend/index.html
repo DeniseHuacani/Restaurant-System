@@ -1002,12 +1002,12 @@
       </div>
     </div>
 
-    <!-- MODAL DE COBRO (FACTURACIÓN) -->
+    <!-- MODAL DE COBRO  -->
     <div id="billing-modal" class="fixed inset-0 z-[60] flex items-center justify-center hidden">
       <div class="absolute inset-0 modal-overlay" id="billing-modal-overlay"></div>
       <div class="relative bg-surface p-xl rounded-xl border border-outline-variant shadow-xl w-full max-w-lg modal-content flex flex-col">
         <div class="flex justify-between items-center mb-md">
-          <h3 class="font-headline-md text-headline-md">Facturación y Cobro</h3>
+          <h3 class="font-headline-md text-headline-md">Cobro</h3>que e
           <button type="button" class="material-symbols-outlined hover:bg-surface-container-high p-xs rounded-full" id="billing-modal-close">close</button>
         </div>
 
@@ -1036,8 +1036,8 @@
             <!-- Datos del Cliente -->
             <div class="grid grid-cols-2 gap-md">
               <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
-                DNI / RUC
-                <input id="billing-customer-id" type="text" class="rounded-lg border border-outline-variant bg-surface px-sm py-xs" placeholder="Ingresar ID">
+                DNI
+                <input id="billing-customer-id" type="text" maxlength="8" inputmode="numeric" pattern="\d{8}" class="rounded-lg border border-outline-variant bg-surface px-sm py-xs" placeholder="Ingresar ID">
                 <span id="error-billing-customer-id" class="error-message" style="color: red; display: none; font-size: 12px;"></span>
               </label>
               <label class="flex flex-col gap-xs text-label-md text-on-surface-variant">
@@ -1109,10 +1109,12 @@
       </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/state.js"></script>
     <script src="js/validation.js"></script>
-    <script type="module" src="js/services/api.js"></script>
-    <script type="module" src="app.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

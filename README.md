@@ -5,13 +5,53 @@ Arquitectura: separada en dos carpetas principales:
 - frontend/: HTML, CSS y JavaScript del cliente (la UI existente fue movida aquí).
 - backend/: API REST con Node.js + Express y conexión a PostgreSQL (scaffold incluido).
 
-# Despliegue
+# Ejecución del Proyecto
 
-HTML + JavaScript + LocalStorage disponible en frontend/. Para ejecutar el backend siga las instrucciones en backend/README.md.
+El sistema está diseñado como una aplicación Full Stack. El frontend se comunica con una API REST en Node.js que persiste los datos en una base de datos PostgreSQL.
 
-## Ejecucion local
-1. Abre `index.html` en el navegador.
-2. (Opcional) Usa Live Server si deseas recarga automatica.
+## Pasos para ejecutar el sistema completo
+
+A continuación se listan los pasos y comprobaciones necesarias para poner en marcha tanto el backend (Node.js + Express + PostgreSQL) como el frontend (HTML/CSS/JS). Incluye comandos, verificación y tareas recomendadas.
+
+Prerequisitos
+- Node.js (v16+), npm
+- PostgreSQL (servidor en ejecución y acceso con un usuario con permisos de creación)
+- Opcional: npx serve o http-server para servir la carpeta frontend en desarrollo
+
+1) Backend (API)
+- Abrir terminal y ejecutar:
+  - cd backend
+  - npm install
+  - cp .env.example .env   # editar .env y ajustar DATABASE_URL y PORT
+- Crear la base de datos (ejemplo):
+  - createdb restaurantdb
+  - o con psql: psql -U postgres -c "CREATE DATABASE restaurantdb;"
+- Inicializar tablas:
+  - psql "$DATABASE_URL" -f sql/init.sql
+  - o: psql -d restaurantdb -f backend/sql/init.sql
+- Poblar con datos iniciales (opcional):
+  - psql "$DATABASE_URL" -f sql/seed.sql
+  - o: psql -d restaurantdb -f backend/sql/seed.sql
+- Iniciar el servidor:
+  - npm start
+  - (en desarrollo) npm run dev si instalas nodemon
+- Verificar Backend:
+  - curl http://localhost:3000/  -> debe devolver {"ok":true,...}
+  - curl http://localhost:3000/api/productos  -> lista vacía o productos
+
+2) Frontend (cliente)
+El frontend es modular y consume la API automáticamente a través de `state.js`. Debido al uso de múltiples scripts y peticiones de red, **debe ser servido mediante un servidor HTTP** (no abrir el archivo .html directamente).
+
+- Servir la carpeta:
+  - npx serve frontend -p 8080
+  - o npx http-server frontend -p 8080
+- Abrir en el navegador: `http://localhost:8080/`
+
+3) Flujo de trabajo en desarrollo
+- **Terminal A (Backend):** `cd backend && npm start` (Puerto 3000)
+- **Terminal B (Frontend):** `npx serve frontend -p 8080` (Puerto 8080)
+- El frontend se conectará automáticamente a `http://localhost:3000/api`.
+
 
 ## GitHub Pages
 1. Sube el repositorio a GitHub.

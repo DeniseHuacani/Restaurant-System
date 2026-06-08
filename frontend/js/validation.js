@@ -21,7 +21,7 @@
     else if ((state.mesas || []).some(mesa => mesa.numero === input.numero && mesa.id !== state.editingMesaId)) errors.push('El numero de mesa ya esta registrado.');
 
     if (input.capacidad === undefined || input.capacidad === null || input.capacidad === '') errors.push('La capacidad es obligatoria.');
-    else if (!Number.isInteger(input.capacidad)) errors.push('La capacidad debe ser un numero entero.');
+    else if (!Number.isInteger(input.capacidad)) errors.push('La capacidad debe ser un valor entero.');
     else if (input.capacidad < 1 || input.capacidad > 16) errors.push('La capacidad debe estar entre 1 y 16.');
 
     if (!['LIBRE', 'OCUPADA', 'DESHABILITADA'].includes(input.estado)) errors.push('El estado debe ser LIBRE, OCUPADA o DESHABILITADA.');
@@ -41,7 +41,7 @@
     else if ((state.meseros || []).some(mesero => mesero.id === input.id && mesero.id !== state.editingMeseroId)) errors.push('El ID del mesero ya existe.');
 
     if (!input.nombre) errors.push('El nombre es obligatorio.');
-    else if (!utils.isValidNameLength ? !(input.nombre.length >= 2 && input.nombre.length <= 50) : !utils.isValidNameLength(input.nombre)) errors.push('El campo de texto debe contener entre 2 y 50 caracteres.');
+    else if (!utils.isValidNameLength(input.nombre)) errors.push('El nombre debe tener al menos 2 caracteres (máximo 50).');
     else if (!utils.isStrictAlphaText(input.nombre)) errors.push('Error de Seguridad: El nombre del mesero NO puede contener números ni símbolos.');
 
     if (!input.dni) errors.push('El DNI es obligatorio.');
@@ -63,7 +63,7 @@
     else if ((state.productos || []).some(producto => producto.id === input.id && producto.id !== state.editingProductoId)) errors.push('El ID del producto ya existe.');
 
     if (!input.nombre) errors.push('El nombre es obligatorio.');
-    else if (!utils.isValidNameLength ? !(input.nombre.length >= 2 && input.nombre.length <= 50) : !utils.isValidNameLength(input.nombre)) errors.push('El campo de texto debe contener entre 2 y 50 caracteres.');
+    else if (!utils.isValidNameLength(input.nombre)) errors.push('El nombre debe tener al menos 2 caracteres (máximo 50).');
     else if (!utils.isStrictAlphaText(input.nombre)) errors.push('Error de Seguridad: El nombre del producto NO puede contener números ni símbolos.');
 
     if (!input.precio) errors.push('El precio es obligatorio.');
@@ -109,7 +109,7 @@
 
     if (input.tipo === 'PARA_LLEVAR') {
       if (!input.cliente) errors.push('El nombre para llevar es obligatorio.');
-      else if (!utils.isValidNameLength ? !(input.cliente.length >= 2 && input.cliente.length <= 50) : !utils.isValidNameLength(input.cliente)) errors.push('El campo de texto debe contener entre 2 y 50 caracteres.');
+      else if (!utils.isValidNameLength(input.cliente)) errors.push('El nombre del cliente debe tener al menos 2 caracteres (máximo 50).');
       else if (!utils.isStrictAlphaText(input.cliente)) errors.push('Error de Seguridad: El nombre del cliente NO puede contener números.');
 
       if (input.mesaId) errors.push('No se permite mesa en ordenes PARA LLEVAR.');
