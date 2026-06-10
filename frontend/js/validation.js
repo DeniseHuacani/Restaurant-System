@@ -21,7 +21,7 @@
     else if ((state.mesas || []).some(mesa => mesa.numero === input.numero && mesa.id !== state.editingMesaId)) errors.push('El numero de mesa ya esta registrado.');
 
     if (input.capacidad === undefined || input.capacidad === null || input.capacidad === '') errors.push('La capacidad es obligatoria.');
-    else if (!Number.isInteger(input.capacidad)) errors.push('La capacidad debe ser un valor entero.');
+    else if (!Number.isInteger(input.capacidad)) errors.push('La capacidad debe ser un numero entero.');
     else if (input.capacidad < 1 || input.capacidad > 16) errors.push('La capacidad debe estar entre 1 y 16.');
 
     if (!['LIBRE', 'OCUPADA', 'DESHABILITADA'].includes(input.estado)) errors.push('El estado debe ser LIBRE, OCUPADA o DESHABILITADA.');
@@ -152,6 +152,23 @@
     if (errors.length) throw new ValidationError(errors);
   }
 
+  function checkMesaActionLocks(state, mesaId) {
+    const activeOrders = (state.ordenes || []).filter(o => o.mesaId === mesaId && o.estado !== 'PAGADO');
+    const mesa = (state.mesas || []).find(m => m.id === mesaId);
+    if ((mesa && mesa.estado === 'OCUPADA') || activeOrders.length > 0) {
+      throw new Error("No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.");
+    }
+  }
+
+  function getNextOrderState(currentState) {
+    const states = {
+      'PENDIENTE': 'EN COCINA',
+      'EN COCINA': 'LISTO',
+      'LISTO': 'PAGADO'
+    };
+    return states[String(currentState).toUpperCase()] || null;
+  }
+
   return {
     ValidationError,
     validateMesa,
@@ -159,5 +176,7 @@
     validateProducto,
     validateOrden,
     validateOrdenItem,
+    checkMesaActionLocks,
+    getNextOrderState
   };
 });

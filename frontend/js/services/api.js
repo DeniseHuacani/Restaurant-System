@@ -179,7 +179,7 @@ export async function upsertOrdenes(ordenesArray) {
       estado: orden.estado || 'PENDIENTE'
     };
 
-    const items = (orden.items || []).map(it => ({ producto_id: it.productId, cantidad: it.cantidad, precio_cents: it.precioCents }));
+    const items = (orden.items || []).map(it => ({ producto_id: it.productId, cantidad: it.cantidad }));
 
     if (cache.ordenes.has(orden.id)) {
       // actualizar (se espera que el backend soporte PUT /api/ordenes/:id)

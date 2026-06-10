@@ -1,0 +1,4 @@
+module.exports = {
+  PACKAGING_FEE_CENTS: 40,
+  ORDER_STATES: ['PENDIENTE', 'EN COCINA', 'LISTO', 'PAGADO']
+};

@@ -1,5 +1,15 @@
 /** @jest-environment jsdom */
-const app = require('./frontend/app');
+const utils = require('./frontend/js/utils');
+const stateManager = require('./frontend/js/state');
+const validation = require('./frontend/js/validation');
+
+// Reconstruimos el objeto 'app' que los tests de caja negra esperan unificando los módulos del frontend
+const app = {
+  ...utils,
+  ...stateManager,
+  ...validation,
+  state: stateManager.state
+};
 
 describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', () => {
   
@@ -28,22 +38,22 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     test('TC-ME-02/03: Capacidad válida en fronteras (1 y 16)', () => {
       const mesaMin = { id: "M01", numero: 1, capacidad: 1, estado: "LIBRE" };
       const mesaMax = { id: "M01", numero: 1, capacidad: 16, estado: "LIBRE" };
-      expect(() => app.validateMesa(mesaMin)).not.toThrow();
-      expect(() => app.validateMesa(mesaMax)).not.toThrow();
+      expect(() => app.validateMesa(app.state, mesaMin)).not.toThrow();
+      expect(() => app.validateMesa(app.state, mesaMax)).not.toThrow();
     });
 
     // TC-ME-04 / TC-ME-05
     test('TC-ME-04/05: Capacidad inválida fuera de rango (0 y 17)', () => {
       const mesaBajo = { id: "M01", numero: 1, capacidad: 0, estado: "LIBRE" };
       const mesaSobre = { id: "M01", numero: 1, capacidad: 17, estado: "LIBRE" };
-      expect(() => app.validateMesa(mesaBajo)).toThrow(/entre 1 y 16/);
-      expect(() => app.validateMesa(mesaSobre)).toThrow(/entre 1 y 16/);
+      expect(() => app.validateMesa(app.state, mesaBajo)).toThrow(/entre 1 y 16/);
+      expect(() => app.validateMesa(app.state, mesaSobre)).toThrow(/entre 1 y 16/);
     });
 
     // TC-ME-06
     test('TC-ME-06: Cruce de tipos - Letras en capacidad', () => {
       const mesaLetras = { id: "M01", numero: 1, capacidad: "Diez", estado: "LIBRE" };
-      expect(() => app.validateMesa(mesaLetras)).toThrow(/numero entero/);
+      expect(() => app.validateMesa(app.state, mesaLetras)).toThrow(/numero entero/);
     });
 
     // TC-ME-07
@@ -51,7 +61,7 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       app.state.mesas = [{ id: "M01", numero: 1, capacidad: 4, estado: "OCUPADA", habilitada: true, activo: true }];
       app.state.ordenes = [{ id: "O1", mesaId: "M01", estado: "PENDIENTE" }];
       
-      expect(() => app.checkMesaActionLocks("M01")).toThrow("No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.");
+      expect(() => app.checkMesaActionLocks(app.state, "M01")).toThrow("No se puede modificar ni eliminar la mesa porque tiene órdenes asociadas.");
     });
   });
 
@@ -59,15 +69,15 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     // TC-MS-01
     test('TC-MS-01: DNI exacto de 8 dígitos', () => {
       const mesero = { id: "W01", nombre: "Juan Perez", dni: "12345678", celular: "987654321", estado: "ACTIVO" };
-      expect(() => app.validateMesero(mesero)).not.toThrow();
+      expect(() => app.validateMesero(app.state, mesero)).not.toThrow();
     });
 
     // TC-MS-02 / TC-MS-03
     test('TC-MS-02/03: DNI inválido por longitud (7 y 9)', () => {
       const dniCorto = { id: "W01", nombre: "Juan Perez", dni: "1234567", celular: "987654321", estado: "ACTIVO" };
       const dniLargo = { id: "W01", nombre: "Juan Perez", dni: "123456789", celular: "987654321", estado: "ACTIVO" };
-      expect(() => app.validateMesero(dniCorto)).toThrow(/exactamente 8 dígitos/i);
-      expect(() => app.validateMesero(dniLargo)).toThrow(/exactamente 8 dígitos/i);
+      expect(() => app.validateMesero(app.state, dniCorto)).toThrow(/exactamente 8 dígitos/i);
+      expect(() => app.validateMesero(app.state, dniLargo)).toThrow(/exactamente 8 dígitos/i);
     });
 
     // TC-MS-04 / TC-MS-05 / TC-MS-06
@@ -75,21 +85,21 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       const celVaild = { id: "W01", nombre: "Juan Perez", dni: "12345678", celular: "987654321", estado: "ACTIVO" };
       const celCorto = { id: "W01", nombre: "Juan Perez", dni: "12345678", celular: "98765432", estado: "ACTIVO" };
       const celLargo = { id: "W01", nombre: "Juan Perez", dni: "12345678", celular: "9876543210", estado: "ACTIVO" };
-      expect(() => app.validateMesero(celVaild)).not.toThrow();
-      expect(() => app.validateMesero(celCorto)).toThrow(/exactamente 9 dígitos/i);
-      expect(() => app.validateMesero(celLargo)).toThrow(/exactamente 9 dígitos/i);
+      expect(() => app.validateMesero(app.state, celVaild)).not.toThrow();
+      expect(() => app.validateMesero(app.state, celCorto)).toThrow(/exactamente 9 dígitos/i);
+      expect(() => app.validateMesero(app.state, celLargo)).toThrow(/exactamente 9 dígitos/i);
     });
 
     // TC-MS-07
     test('TC-MS-07: Bloqueo de números en nombre de mesero', () => {
       const meseroNum = { id: "W01", nombre: "Juan 123", dni: "12345678", celular: "987654321", estado: "ACTIVO" };
-      expect(() => app.validateMesero(meseroNum)).toThrow(/NO puede contener números/);
+      expect(() => app.validateMesero(app.state, meseroNum)).toThrow(/NO puede contener números/);
     });
 
     // TC-MS-08
     test('TC-MS-08: Cruce de tipos - Letras en DNI', () => {
       const meseroLetras = { id: "W01", nombre: "Juan Perez", dni: "ABCDEFGH", celular: "987654321", estado: "ACTIVO" };
-      expect(() => app.validateMesero(meseroLetras)).toThrow(/exactamente 8 dígitos numéricos/i);
+      expect(() => app.validateMesero(app.state, meseroLetras)).toThrow(/exactamente 8 dígitos numéricos/i);
     });
   });
 
@@ -98,37 +108,37 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     test('TC-CA-01/03: Precios en fronteras (0.01 y 999999)', () => {
       const pMin = { id: "P01", nombre: "Agua", precio: "0.01", descripcion: "Agua mineral", disponibilidad: true, estado: true };
       const pMax = { id: "P01", nombre: "Vino", precio: "999999.00", descripcion: "Vino caro", disponibilidad: true, estado: true };
-      expect(() => app.validateProducto(pMin)).not.toThrow();
-      expect(() => app.validateProducto(pMax)).not.toThrow();
+      expect(() => app.validateProducto(app.state, pMin)).not.toThrow();
+      expect(() => app.validateProducto(app.state, pMax)).not.toThrow();
     });
 
     // TC-CA-02 / TC-CA-04
     test('TC-CA-02/04: Precios fuera de rango (0.00 y 999999.01)', () => {
       const pCero = { id: "P01", nombre: "Agua", precio: "0.00", descripcion: "Gratis", disponibilidad: true, estado: true };
       const pExceso = { id: "P01", nombre: "Agua", precio: "999999.01", descripcion: "Muy caro", disponibilidad: true, estado: true };
-      expect(() => app.validateProducto(pCero)).toThrow(/mayor a 0 y menor que 999999/);
-      expect(() => app.validateProducto(pExceso)).toThrow(/mayor a 0 y menor que 999999/);
+      expect(() => app.validateProducto(app.state, pCero)).toThrow(/mayor a 0 y menor que 999999/);
+      expect(() => app.validateProducto(app.state, pExceso)).toThrow(/mayor a 0 y menor que 999999/);
     });
 
     // TC-CA-05
     test('TC-CA-05: Cruce de tipos - Símbolos en descripción', () => {
       const pScript = { id: "P01", nombre: "Sopa", precio: "10.00", descripcion: "<script>alert()</script>", disponibilidad: true, estado: true };
-      expect(() => app.validateProducto(pScript)).toThrow(/NO permite números ni símbolos/);
+      expect(() => app.validateProducto(app.state, pScript)).toThrow(/NO permite números ni símbolos/);
     });
 
     // TC-CA-07
     test('TC-CA-07: Descripción de producto: Longitud válida en fronteras (2 y 500)', () => {
       const pMin = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "Ab", disponibilidad: true, estado: true };
       const pMax = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A".repeat(500), disponibilidad: true, estado: true };
-      expect(() => app.validateProducto(pMin)).not.toThrow();
-      expect(() => app.validateProducto(pMax)).not.toThrow();
+      expect(() => app.validateProducto(app.state, pMin)).not.toThrow();
+      expect(() => app.validateProducto(app.state, pMax)).not.toThrow();
     });
 
     test('TC-CA-08: Descripción de producto: Longitud inválida (1 y 501)', () => {
       const pBajo = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A", disponibilidad: true, estado: true };
       const pSobre = { id: "P01", nombre: "Agua", precio: "1.00", descripcion: "A".repeat(501), disponibilidad: true, estado: true };
-      expect(() => app.validateProducto(pBajo)).toThrow(/entre 2 y 500 caracteres/);
-      expect(() => app.validateProducto(pSobre)).toThrow(/entre 2 y 500 caracteres/);
+      expect(() => app.validateProducto(app.state, pBajo)).toThrow(/entre 2 y 500 caracteres/);
+      expect(() => app.validateProducto(app.state, pSobre)).toThrow(/entre 2 y 500 caracteres/);
     });
 
     // TC-CA-06
@@ -159,8 +169,8 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     test('TC-OR-01/02: Cliente obligatorio en Para Llevar', () => {
       const ordenOk = { id: "O-001", tipo: "PARA_LLEVAR", cliente: "Ana Garcia" };
       const ordenBad = { id: "O-001", tipo: "PARA_LLEVAR", cliente: "" };
-      expect(() => app.validateOrden(ordenOk)).not.toThrow();
-      expect(() => app.validateOrden(ordenBad)).toThrow(/nombre para llevar es obligatorio/i);
+      expect(() => app.validateOrden(app.state, ordenOk)).not.toThrow();
+      expect(() => app.validateOrden(app.state, ordenBad)).toThrow(/nombre para llevar es obligatorio/i);
     });
 
     // TC-OR-03
@@ -168,13 +178,13 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       app.state.mesas = [{ id: "M1", numero: 1, capacidad: 4, estado: "LIBRE", habilitada: true }];
       app.state.meseros = [{ id: "W1", nombre: "Juan", estado: "ACTIVO" }];
       const validOrden = { id: "O-001", tipo: "MESA", mesaId: "M1", meseroId: "W1" };
-      expect(() => app.validateOrden(validOrden)).not.toThrow();
+      expect(() => app.validateOrden(app.state, validOrden)).not.toThrow();
     });
 
     // TC-OR-04
     test('TC-OR-04: Bloqueo de números en nombre del cliente', () => {
       const ordenNum = { id: "O-001", tipo: "PARA_LLEVAR", cliente: "Pedro 01" };
-      expect(() => app.validateOrden(ordenNum)).toThrow(/NO puede contener números/i);
+      expect(() => app.validateOrden(app.state, ordenNum)).toThrow(/NO puede contener números/i);
     });
   });
 
@@ -187,8 +197,8 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
       const itemOk = { ordenId: "O-001", productoId: "P01", cantidad: 1 };
       const itemBad = { ordenId: "O-001", productoId: "P01", cantidad: 0 };
       
-      expect(() => app.validateOrdenItem(itemOk)).not.toThrow();
-      expect(() => app.validateOrdenItem(itemBad)).toThrow("La cantidad debe estar entre 1 y 99.");
+      expect(() => app.validateOrdenItem(app.state, itemOk)).not.toThrow();
+      expect(() => app.validateOrdenItem(app.state, itemBad)).toThrow("La cantidad debe estar entre 1 y 99.");
     });
 
     // TC-IT-03
@@ -203,7 +213,7 @@ describe('RestSystem MVP - Suite de Pruebas de Caja Negra (AVL & Particiones)', 
     test('TC-IT-04: Cruce de tipos - Letras en cantidad', () => {
       app.state.ordenes = [{ id: "O-001", items: [], estado: "PENDIENTE" }];
       const itemLetras = { ordenId: "O-001", productoId: "P01", cantidad: "Tres" };
-      expect(() => app.validateOrdenItem(itemLetras)).toThrow(/numero entero/i);
+      expect(() => app.validateOrdenItem(app.state, itemLetras)).toThrow(/numero entero/i);
     });
   });
 

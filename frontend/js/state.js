@@ -44,16 +44,16 @@
         payload.cliente_nombre = item.clienteNombre || null;
         payload.cliente_dni = item.clienteDni || null;
         // Fallback por si el backend usa cliente_id basado en el ID del input
-        payload.cliente_id = item.clienteDni || null; 
+        payload.cliente_id = item.clienteDni || null;
         delete payload.mesaId;
         delete payload.meseroId;
         delete payload.clienteNombre;
         delete payload.clienteDni;
         if (item.items) {
+          // Enviar sólo producto_id y cantidad: el backend tomará el precio desde la DB (precisión en céntimos)
           payload.items = item.items.map(it => ({
             producto_id: it.productId || it.producto_id,
-            cantidad: it.cantidad,
-            precio_cents: it.precioCents || it.precio_cents
+            cantidad: Number(it.cantidad)
           }));
         }
       }
@@ -117,7 +117,14 @@
   }
 
   function calculateOrderTotals(orden) {
-    const itemsTotal = orden.items.reduce((t, i) => t + (i.precioCents * i.cantidad), 0);
+    // Preferir total autoritativo del backend si existe (total_cents)
+    if (orden && (typeof orden.total_cents === 'number' || typeof orden.totalCents === 'number')) {
+      const serverTotal = typeof orden.total_cents === 'number' ? orden.total_cents : orden.totalCents;
+      const packagingFee = orden.tipo === config.ORDER_TYPES.PARA_LLEVAR ? config.PACKAGING_FEE_CENTS : 0;
+      const subtotal = Math.max(0, serverTotal - packagingFee);
+      return { subtotalCents: subtotal, packagingFeeCents: packagingFee, totalCents: serverTotal };
+    }
+    const itemsTotal = (orden.items || []).reduce((t, i) => t + ((i.precioCents || i.precio_cents || 0) * Number(i.cantidad || 0)), 0);
     const packagingFee = orden.tipo === config.ORDER_TYPES.PARA_LLEVAR ? config.PACKAGING_FEE_CENTS : 0;
     return { subtotalCents: itemsTotal, packagingFeeCents: packagingFee, totalCents: itemsTotal + packagingFee };
   }

@@ -134,18 +134,12 @@
       };
       validation.validateOrden(state, input);
       const nuevaOrden = { ...input, estado: "PENDIENTE", items: [] };
-      state.ordenes.push(nuevaOrden);
-      if (input.tipo === "MESA") {
-        const m = state.mesas.find(m => m.id === input.mesaId);
-        if (m) {
-          m.estado = "OCUPADA";
-          await stateManager.saveItem(config.STORAGE_KEYS.mesas, m, true);
-        }
-      }
+      // Crear orden en backend primero. El backend validará mesa/mesero y marcará la mesa como OCUPADA si aplica.
       await stateManager.saveItem(config.STORAGE_KEYS.ordenes, nuevaOrden, false);
+      // Refrescar el estado completo desde el servidor para obtener valores autoritativos (mesas, ordenes, totales)
+      await stateManager.initState();
       ui.resetOrdenForm();
-      ui.renderOrdenes();
-      ui.renderMesas();
+      ui.renderAll();
     } catch (err) {
       if (err instanceof validation.ValidationError) ui.displayFieldErrors(err.errors, { 
         "ID": "error-orden-id",
@@ -268,20 +262,15 @@
       const orden = state.ordenes.find(o => o.id === ordenId);
       if (!orden) return;
 
+      // Marcar como PAGADO y delegar la liberación de la mesa al backend
       orden.estado = "PAGADO";
       orden.clienteDni = dni;
       orden.clienteNombre = name;
 
-      if (orden.mesaId) {
-        const mesa = state.mesas.find(m => m.id === orden.mesaId);
-        if (mesa) {
-          mesa.estado = mesa.habilitada ? "LIBRE" : "DESHABILITADA";
-          await stateManager.saveItem(config.STORAGE_KEYS.mesas, mesa, true);
-        }
-      }
-
       await stateManager.saveItem(config.STORAGE_KEYS.ordenes, orden, true);
-      
+      // Refrescar estado para que el backend devuelva la mesa liberada y totales actualizados
+      await stateManager.initState();
+
       alert(`¡Pago exitoso! Cambio a entregar: ${els.billingChangeAmount.textContent}`);
       ui.closeBillingModal();
       ui.renderAll();

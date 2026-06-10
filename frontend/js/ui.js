@@ -414,9 +414,17 @@
       });
     }
 
-    const totals = stateManager.calculateOrderTotals(orden);
-    els.billingTotalAmount.textContent = `S/ ${utils.formatCents(totals.totalCents)}`;
-    state.currentOrderTotalCents = totals.totalCents;
+    // Preferir total devuelto por servidor si existe
+    const serverTotal = (typeof orden.total_cents === 'number') ? orden.total_cents : (typeof orden.totalCents === 'number' ? orden.totalCents : null);
+    let totalCents;
+    if (serverTotal !== null) {
+      totalCents = serverTotal;
+    } else {
+      const totals = stateManager.calculateOrderTotals(orden);
+      totalCents = totals.totalCents;
+    }
+    els.billingTotalAmount.textContent = `S/ ${utils.formatCents(totalCents)}`;
+    state.currentOrderTotalCents = totalCents;
     state.currentOrderIdForBilling = id;
 
     if (orden.cliente) {
