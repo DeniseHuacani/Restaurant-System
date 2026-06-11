@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const productsRouter = require('./routes/products');
@@ -16,6 +17,13 @@ app.use('/api/mesas', mesasRouter);
 app.use('/api/meseros', meserosRouter);
 app.use('/api/ordenes', ordersRouter);
 
-app.get('/', (req, res) => res.json({ ok: true, message: 'Restaurant backend up' }));
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '../../frontend')));
+
+// Cualquier ruta que no sea de la API, redirige al index.html del frontend
+// Esto es fundamental para que el despliegue funcione como una Single Page App
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/index.html'));
+});
 
 module.exports = app;
