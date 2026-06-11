@@ -6,7 +6,10 @@
     root.App.stateManager = factory(root.App.config, root.App.utils);
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (config, utils) {
-  const API_BASE_URL = "http://localhost:3000/api";
+  // Detectar si estamos en local o en producción para ajustar la URL del API
+  const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? "http://localhost:3000/api"
+    : "/api";
 
   const state = {
     mesas: [],
