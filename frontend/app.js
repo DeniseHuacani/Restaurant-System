@@ -11,19 +11,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    // 1. Inicializar datos desde persistencia
-    await App.stateManager.initState();
-    
-    // 2. Vincular eventos de la interfaz
+    // 1. Vincular eventos de la interfaz PRIMERO
+    // Esto asegura que las pestañas (tabs) funcionen aunque falle la carga de datos
     App.controllers.bindEvents();
 
-    // 3. Renderizado inicial
+    // 2. Inicializar datos desde el servidor
+    await App.stateManager.initState();
+    
+    // 3. Renderizado inicial de datos
     App.ui.renderAll();
 
     console.info("Restaurant-System inicializado correctamente.");
 
-    // Ejecutar prueba de API (opcional)
-    if (typeof window.fetch === 'function') {
+    if (window.location.hostname === 'localhost') {
       probarAPI();
     }
 
